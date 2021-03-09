@@ -28,6 +28,7 @@ const (
 )
 
 func init() {
+	r.StaticFile("/", "./static/index.html")
 	r.GET("/ping", pingHandler)
 	r.GET("/meme", memeHandler)
 
