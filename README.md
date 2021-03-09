@@ -9,8 +9,12 @@ Projeto de testes para testarmos algumas ideias como:
 
 # TO-DO's
 
-* ✅ criar uma pagina com um <form> pra chamar o `/meme`
-* fazer word-wrap, para quebrar textos grandes (podemos utilizar testes)
+* centralizar verticalmente o texto nos boxes brancos
 * fazer deploy no heroku usando docker e GO 1.16+
 *
 
+# DONE
+
+* ✅ criar uma pagina com um <form> pra chamar o `/meme`
+* ✅ fazer word-wrap, para quebrar textos grandes
+*

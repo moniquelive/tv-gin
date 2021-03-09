@@ -11,6 +11,7 @@ import (
 	"log"
 	"net/http"
 	"os"
+	"strings"
 
 	"github.com/gin-gonic/gin"
 	"github.com/golang/freetype"
@@ -22,9 +23,9 @@ var ttfont *truetype.Font
 
 const (
 	dpi      = 72
-	fontfile = "jetbrains.ttf"
+	fontFile = "jetbrains.ttf"
 	size     = 64
-	spacing  = 1.5
+	spacing  = 1
 )
 
 func init() {
@@ -32,7 +33,7 @@ func init() {
 	r.GET("/ping", pingHandler)
 	r.GET("/meme", memeHandler)
 
-	fontBytes, err := ioutil.ReadFile(fontfile)
+	fontBytes, err := ioutil.ReadFile(fontFile)
 	if err != nil {
 		log.Println(err)
 		return
@@ -41,6 +42,12 @@ func init() {
 	if err != nil {
 		log.Println(err)
 		return
+	}
+}
+
+func main() {
+	if err := r.Run(); err != nil {
+		log.Fatalln("r.Run:", err)
 	}
 }
 
@@ -71,16 +78,16 @@ func memeHandler(c *gin.Context) {
 	fc.SetClip(rgba.Bounds())
 	fc.SetDst(rgba)
 	fc.SetSrc(fg)
-	//fc.SetHinting(font.HintingNone)
-	fc.SetHinting(font.HintingFull)
+	fc.SetHinting(font.HintingNone)
+	//fc.SetHinting(font.HintingFull)
 
 	// Draw the text.
-	err = drawString(fc, []string{text1}, 655, 40)
+	err = drawString(fc, wordWrap(text1, 13), 655, 40)
 	if err != nil {
 		return
 	}
 
-	err = drawString(fc, []string{text2}, 655, 650)
+	err = drawString(fc, wordWrap(text2, 13), 655, 650)
 	if err != nil {
 		return
 	}
@@ -93,6 +100,22 @@ func memeHandler(c *gin.Context) {
 		return
 	}
 	c.DataFromReader(http.StatusOK, int64(rw.Len()), "image/jpeg", &rw, nil)
+}
+
+func pingHandler(c *gin.Context) {
+	c.JSON(200, gin.H{
+		"message": "pong",
+	})
+}
+
+func getImageFromFilePath(filePath string) (image.Image, error) {
+	f, err := os.Open(filePath)
+	if err != nil {
+		return nil, err
+	}
+	defer f.Close()
+	img, _, err := image.Decode(f)
+	return img, err
 }
 
 func drawString(fc *freetype.Context, text []string, x, y int) error {
@@ -108,24 +131,21 @@ func drawString(fc *freetype.Context, text []string, x, y int) error {
 	return nil
 }
 
-func getImageFromFilePath(filePath string) (image.Image, error) {
-	f, err := os.Open(filePath)
-	if err != nil {
-		return nil, err
+func wordWrap(text string, lineWidth int) (lines []string) {
+	words := strings.Fields(strings.TrimSpace(text))
+	if len(words) == 0 {
+		return []string{}
 	}
-	defer f.Close()
-	img, _, err := image.Decode(f)
-	return img, err
-}
-
-func main() {
-	if err := r.Run(); err != nil {
-		log.Fatalln("r.Run:", err)
+	lines = []string{words[0]}
+	spaceLeft := lineWidth - len(lines[len(lines)-1])
+	for _, word := range words[1:] {
+		if len(word)+1 > spaceLeft {
+			lines = append(lines, word)
+			spaceLeft = lineWidth - len(word)
+		} else {
+			lines[len(lines)-1] += " " + word
+			spaceLeft -= 1 + len(word)
+		}
 	}
-}
-
-func pingHandler(c *gin.Context) {
-	c.JSON(200, gin.H{
-		"message": "pong",
-	})
+	return
 }
