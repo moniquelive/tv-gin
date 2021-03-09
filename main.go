@@ -2,7 +2,6 @@ package main
 
 import (
 	"bytes"
-	"github.com/golang/freetype/truetype"
 	"image"
 	"image/color"
 	"image/draw"
@@ -15,6 +14,7 @@ import (
 
 	"github.com/gin-gonic/gin"
 	"github.com/golang/freetype"
+	"github.com/golang/freetype/truetype"
 	"golang.org/x/image/font"
 )
 
@@ -82,12 +82,14 @@ func memeHandler(c *gin.Context) {
 	//fc.SetHinting(font.HintingFull)
 
 	// Draw the text.
-	err = drawString(fc, wordWrap(text1, 13), 655, 40)
+	y := measureString(fc, wordWrap(text1, 13))
+	err = drawString(fc, wordWrap(text1, 13), 655, 300-y/2)
 	if err != nil {
 		return
 	}
 
-	err = drawString(fc, wordWrap(text2, 13), 655, 650)
+	y = measureString(fc, wordWrap(text2, 13))
+	err = drawString(fc, wordWrap(text2, 13), 655, 600+300-y/2)
 	if err != nil {
 		return
 	}
@@ -129,6 +131,11 @@ func drawString(fc *freetype.Context, text []string, x, y int) error {
 		pt.Y += fc.PointToFixed(size * spacing)
 	}
 	return nil
+}
+
+func measureString(fc *freetype.Context, text []string) int {
+	return int(fc.PointToFixed(size)>>6) +
+		(len(text)-1)*(int(fc.PointToFixed(size*spacing))>>6)
 }
 
 func wordWrap(text string, lineWidth int) (lines []string) {

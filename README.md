@@ -15,6 +15,6 @@ Projeto de testes para testarmos algumas ideias como:
 
 # DONE
 
-* ✅ criar uma pagina com um <form> pra chamar o `/meme`
+* ✅ criar uma pagina com um `<form>` pra chamar o `/meme`
 * ✅ fazer word-wrap, para quebrar textos grandes
 *
