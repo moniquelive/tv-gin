@@ -8,6 +8,7 @@ Projeto de testes para testarmos algumas ideias como:
 
 # TO-DO's
 
+* acertar layout para mobiles 
 * centralizar verticalmente o texto nos boxes brancos
 * fazer deploy no heroku usando docker e GO 1.16+
 * implementar testes
