@@ -10,6 +10,7 @@ Projeto de testes para testarmos algumas ideias como:
 # TO-DO's
 
 * centralizar verticalmente o texto nos boxes brancos
+* usar um CNAME mais bacana
 * fazer deploy no heroku usando docker e GO 1.16+
 *
 
