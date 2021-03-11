@@ -8,7 +8,6 @@ Projeto de testes para testarmos algumas ideias como:
 
 # TO-DO's
 
-* fazer deploy no heroku usando docker e GO 1.16+
 * centralizar verticalmente o texto nos boxes brancos
 * implementar testes
 * upload de outras imagens
@@ -20,4 +19,12 @@ Projeto de testes para testarmos algumas ideias como:
 * ✅ criar uma pagina com um `<form>` pra chamar o `/meme`
 * ✅ fazer word-wrap, para quebrar textos grandes
 * ✅ usar um CNAME mais bacana (https://meme.monique.dev)
-* ✅ acertar layout para mobiles 
+* ✅ acertar layout para mobiles
+* ✅ fazer deploy no heroku usando docker e GO 1.16+
+
+# Comandos para fazer deploy via docker no Heroku
+
+* `heroku container:login`
+* `heroku container:push web`
+* `heroku container:release web`
+
