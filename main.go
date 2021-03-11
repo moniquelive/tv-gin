@@ -5,13 +5,14 @@ import (
 	"log"
 	"net/http"
 
+	"github.com/gin-contrib/static"
 	"github.com/gin-gonic/gin"
 )
 
 var r = gin.Default()
 
 func init() {
-	r.StaticFile("/", "./static/index.html")
+	r.Use(static.Serve("/", static.LocalFile("./static", false)))
 	r.GET("/meme", memeHandler)
 }
 

@@ -8,9 +8,8 @@ Projeto de testes para testarmos algumas ideias como:
 
 # TO-DO's
 
-* acertar layout para mobiles 
-* centralizar verticalmente o texto nos boxes brancos
 * fazer deploy no heroku usando docker e GO 1.16+
+* centralizar verticalmente o texto nos boxes brancos
 * implementar testes
 * upload de outras imagens
 * parametros dos retangulos
@@ -21,3 +20,4 @@ Projeto de testes para testarmos algumas ideias como:
 * ✅ criar uma pagina com um `<form>` pra chamar o `/meme`
 * ✅ fazer word-wrap, para quebrar textos grandes
 * ✅ usar um CNAME mais bacana (https://meme.monique.dev)
+* ✅ acertar layout para mobiles 
