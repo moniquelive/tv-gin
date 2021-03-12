@@ -19,7 +19,7 @@ import (
 
 const (
 	dpi          = 72
-	fontFileName = "jetbrains.ttf"
+	fontFileName = "./static/jetbrains.ttf"
 	size         = 64
 	spacing      = 1
 )

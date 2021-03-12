@@ -35,7 +35,7 @@ func memeHandler(c *gin.Context) {
 		{image.Point{X: 600, Y: 600}, image.Point{X: 1199, Y: 1199}},
 	}
 	margin := 55
-	buffer, err := generateMeme("meme.jpg", texts, rects, margin)
+	buffer, err := generateMeme("./static/meme.jpg", texts, rects, margin)
 	if err != nil {
 		c.String(http.StatusInternalServerError, "generateMeme:", err)
 		return
