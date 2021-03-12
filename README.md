@@ -9,12 +9,14 @@ Projeto de testes para testarmos algumas ideias como:
 # TO-DO's
 
 * adicionar headers de opengraph
+* colocar créditos na imagem
+* embedar os arquivos em static/
+* mensagem para developers no console.log
 * centralizar verticalmente o texto nos boxes brancos
 * implementar testes
 * upload de outras imagens
 * parametros dos retangulos
 * numero de retangulo dinamico
-* mensagem para developers no console.log
 
 # DONE
 
