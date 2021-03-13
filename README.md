@@ -8,6 +8,7 @@ Projeto de testes para testarmos algumas ideias como:
 
 # TO-DO's
 
+* extrair meme.go em um pacote a parte
 * mensagem para developers no console.log
 * centralizar verticalmente o texto nos boxes brancos
 * implementar testes
