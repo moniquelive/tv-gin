@@ -2,14 +2,13 @@ package main
 
 import (
 	"bytes"
+	_ "embed"
 	"fmt"
 	"image"
 	"image/color"
 	"image/draw"
 	"image/jpeg"
-	"io/ioutil"
 	"log"
-	"os"
 	"strings"
 
 	"github.com/golang/freetype"
@@ -18,29 +17,28 @@ import (
 )
 
 const (
-	dpi          = 72
-	fontFileName = "./static/jetbrains.ttf"
-	size         = 64
-	spacing      = 1
+	dpi     = 72
+	size    = 64
+	spacing = 1
 )
+
+//go:embed static/jetbrains.ttf
+var fontBytes []byte
 
 var ttfont *truetype.Font
 
 func init() {
-	fontBytes, err := ioutil.ReadFile(fontFileName)
-	if err != nil {
-		log.Fatalln(err)
-	}
+	var err error
 	ttfont, err = freetype.ParseFont(fontBytes)
 	if err != nil {
 		log.Fatalln(err)
 	}
 }
 
-func generateMeme(memeFilename string, texts [2]string, rects [2]image.Rectangle, leftMargin int) (*bytes.Buffer, error) {
-	img, err := getImageFromFilePath(memeFilename)
+func generateMeme(memeBytes []byte, texts [2]string, rects [2]image.Rectangle, leftMargin int) (*bytes.Buffer, error) {
+	img, _, err := image.Decode(bytes.NewReader(memeBytes))
 	if err != nil {
-		return nil, fmt.Errorf("getImageFromFilePath: %w", err)
+		return nil, fmt.Errorf("image.Decode: %w", err)
 	}
 
 	canvas := image.NewRGBA(img.Bounds())
@@ -91,16 +89,6 @@ func generateMeme(memeFilename string, texts [2]string, rects [2]image.Rectangle
 	}
 
 	return &rw, nil
-}
-
-func getImageFromFilePath(filePath string) (image.Image, error) {
-	f, err := os.Open(filePath)
-	if err != nil {
-		return nil, err
-	}
-	defer f.Close()
-	img, _, err := image.Decode(f)
-	return img, err
 }
 
 func drawString(fc *freetype.Context, text []string, x, y int) error {

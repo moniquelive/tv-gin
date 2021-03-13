@@ -31,8 +31,5 @@ FROM scratch
 ENV GIN_MODE=release
 
 COPY --from=builder /go/bin/main .
-COPY jetbrains.ttf .
-COPY meme.jpg .
-COPY static static
 
 ENTRYPOINT ["./main"]

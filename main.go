@@ -1,6 +1,7 @@
 package main
 
 import (
+	"embed"
 	"image"
 	"log"
 	"net/http"
@@ -9,10 +10,16 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
+//go:embed static
+var f embed.FS
+
+//go:embed static/meme.jpg
+var meme []byte
+
 var r = gin.Default()
 
 func init() {
-	r.Use(static.Serve("/", static.LocalFile("./static", false)))
+	r.Use(static.Serve("/", EmbedFolder(f, "static")))
 	r.GET("/meme", memeHandler)
 }
 
@@ -35,7 +42,7 @@ func memeHandler(c *gin.Context) {
 		{image.Point{X: 600, Y: 600}, image.Point{X: 1199, Y: 1199}},
 	}
 	margin := 55
-	buffer, err := generateMeme("./static/meme.jpg", texts, rects, margin)
+	buffer, err := generateMeme(meme, texts, rects, margin)
 	if err != nil {
 		c.String(http.StatusInternalServerError, "generateMeme:", err)
 		return
