@@ -8,9 +8,6 @@ Projeto de testes para testarmos algumas ideias como:
 
 # TO-DO's
 
-* adicionar headers de opengraph
-* colocar créditos na imagem
-* embedar os arquivos em static/
 * mensagem para developers no console.log
 * centralizar verticalmente o texto nos boxes brancos
 * implementar testes
@@ -25,6 +22,9 @@ Projeto de testes para testarmos algumas ideias como:
 * ✅ usar um CNAME mais bacana (https://meme.monique.dev)
 * ✅ acertar layout para mobiles
 * ✅ fazer deploy no heroku usando docker e GO 1.16+
+* ✅ embedar os arquivos em static/
+* ✅ adicionar headers de opengraph
+* ✅ colocar créditos na imagem
 
 # Comandos para fazer deploy via docker no Heroku
 

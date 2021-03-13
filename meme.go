@@ -16,20 +16,22 @@ import (
 	"golang.org/x/image/font"
 )
 
-const (
-	dpi     = 72
-	size    = 64
-	spacing = 1
-)
-
 //go:embed static/jetbrains.ttf
 var fontBytes []byte
 
-var ttfont *truetype.Font
+//go:embed static/Handlee-Regular.ttf
+var creditsFontBytes []byte
+
+var memeFont *truetype.Font
+var creditsFont *truetype.Font
 
 func init() {
 	var err error
-	ttfont, err = freetype.ParseFont(fontBytes)
+	memeFont, err = freetype.ParseFont(fontBytes)
+	if err != nil {
+		log.Fatalln(err)
+	}
+	creditsFont, err = freetype.ParseFont(creditsFontBytes)
 	if err != nil {
 		log.Fatalln(err)
 	}
@@ -43,27 +45,19 @@ func generateMeme(memeBytes []byte, texts [2]string, rects [2]image.Rectangle, l
 
 	canvas := image.NewRGBA(img.Bounds())
 	draw.Draw(canvas, canvas.Bounds(), img, img.Bounds().Min, draw.Src)
-	for x := 0; x < img.Bounds().Max.X; x++ {
-		canvas.Set(x, img.Bounds().Max.Y/2, color.Black)
-	}
 
-	fg, _ := image.Black, image.White
-	fc := freetype.NewContext()
-	fc.SetDPI(dpi)
-	fc.SetFont(ttfont)
-	fc.SetFontSize(size)
-	fc.SetClip(canvas.Bounds())
-	fc.SetDst(canvas)
-	fc.SetSrc(fg)
-	fc.SetHinting(font.HintingNone)
-	//fc.SetHinting(font.HintingFull)
-
-	const wordwrapWidth = 13
+	const (
+		memeFontSize    = 64
+		memeFontSpacing = 1
+		wordwrapWidth   = 13
+	)
+	fc := createFontContext(memeFont, memeFontSize, canvas.Bounds(), canvas, image.Black)
 
 	// Draw the text.
-	y := measureString(fc, wordWrap(texts[0], wordwrapWidth))
+	y := measureString(fc, memeFontSize, memeFontSpacing, wordWrap(texts[0], wordwrapWidth))
 	rect0HalfHeight := rects[0].Dy() / 2
 	err = drawString(fc,
+		memeFontSize, memeFontSpacing,
 		wordWrap(texts[0], wordwrapWidth),
 		rects[0].Min.X+leftMargin,
 		rects[0].Min.Y+rect0HalfHeight-y/2)
@@ -71,14 +65,32 @@ func generateMeme(memeBytes []byte, texts [2]string, rects [2]image.Rectangle, l
 		return nil, fmt.Errorf("drawString (1): %w", err)
 	}
 
-	y = measureString(fc, wordWrap(texts[1], wordwrapWidth))
+	y = measureString(fc, memeFontSize, memeFontSpacing, wordWrap(texts[1], wordwrapWidth))
 	rect1HalfHeight := rects[1].Dy() / 2
 	err = drawString(fc,
+		memeFontSize, memeFontSpacing,
 		wordWrap(texts[1], wordwrapWidth),
 		rects[1].Min.X+leftMargin,
 		rects[1].Min.Y+rect1HalfHeight-y/2)
 	if err != nil {
 		return nil, fmt.Errorf("drawString (2): %w", err)
+	}
+
+	const (
+		creditsFontSize = 32
+		creditsText     = "Esta imagem foi gerada no meme.monique.dev"
+	)
+	creditsFontColor := image.NewUniform(color.RGBA{R: 0xfe, G: 0x43, B: 0x65, A: 0xff})
+	fc = createFontContext(creditsFont, creditsFontSize, canvas.Bounds(), canvas, creditsFontColor)
+	var (
+		creditsWidth      = creditsWidthInPixels(creditsFont, creditsFontSize, creditsText)
+		creditsX          = canvas.Bounds().Max.X - creditsWidth - creditsFontSize
+		creditsFontHeight = int(fc.PointToFixed(creditsFontSize) >> 6)
+		creditsY          = canvas.Bounds().Max.Y - creditsFontHeight*2 - creditsFontSize/4
+	)
+	err = drawString(fc, memeFontSize, memeFontSpacing, []string{creditsText}, creditsX, creditsY)
+	if err != nil {
+		return nil, fmt.Errorf("drawString (3): %w", err)
 	}
 
 	opts := jpeg.Options{Quality: 99}
@@ -91,7 +103,21 @@ func generateMeme(memeBytes []byte, texts [2]string, rects [2]image.Rectangle, l
 	return &rw, nil
 }
 
-func drawString(fc *freetype.Context, text []string, x, y int) error {
+func createFontContext(ttFont *truetype.Font, fontSize float64, clipRectangle image.Rectangle, canvas *image.RGBA, color *image.Uniform) *freetype.Context {
+	fc := freetype.NewContext()
+	fc.SetDPI(72)
+	fc.SetFont(ttFont)
+	fc.SetFontSize(fontSize)
+	fc.SetClip(clipRectangle)
+	fc.SetDst(canvas)
+	fc.SetSrc(color)
+	fc.SetHinting(font.HintingNone)
+	//fc.SetHinting(font.HintingFull)
+	return fc
+}
+
+func drawString(fc *freetype.Context, size, spacing float64, text []string, x, y int) error {
+	// Calculate the widths and print to image
 	pt := freetype.Pt(x, y+int(fc.PointToFixed(size)>>6))
 	for _, s := range text {
 		_, err := fc.DrawString(s, pt)
@@ -104,7 +130,21 @@ func drawString(fc *freetype.Context, text []string, x, y int) error {
 	return nil
 }
 
-func measureString(fc *freetype.Context, text []string) int {
+func creditsWidthInPixels(f *truetype.Font, size float64, text string) int {
+	opts := truetype.Options{
+		Size: size,
+	}
+	face := truetype.NewFace(f, &opts)
+	width := 0
+	for _, x := range text {
+		awidth, _ := face.GlyphAdvance(x)
+		iwidthf := int(float64(awidth) / 64)
+		width += iwidthf
+	}
+	return width
+}
+
+func measureString(fc *freetype.Context, size, spacing float64, text []string) int {
 	return int(fc.PointToFixed(size)>>6) +
 		(len(text)-1)*(int(fc.PointToFixed(size*spacing))>>6)
 }
