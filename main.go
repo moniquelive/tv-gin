@@ -2,7 +2,7 @@ package main
 
 import (
 	"embed"
-	"image"
+	"fmt"
 	"log"
 	"net/http"
 
@@ -13,8 +13,16 @@ import (
 //go:embed static
 var f embed.FS
 
-//go:embed static/meme.jpg
+//go:embed static/drake.jpg
 var meme []byte
+
+var (
+	rects = [2][4]int{
+		{600, 0, 1199, 599},
+		{600, 600, 1199, 1199},
+	}
+	margin = 55
+)
 
 var r = gin.Default()
 
@@ -30,18 +38,25 @@ func main() {
 }
 
 func memeHandler(c *gin.Context) {
-	text1 := c.Query("text1")
-	text2 := c.Query("text2")
-	if text1 == "" || text2 == "" {
-		c.String(http.StatusBadRequest, `parâmetros "text1" e "text2" são obrigatórios`)
+	const param1Name = "text1"
+	const param2Name = "text2"
+	texts := [2]string{
+		c.Query(param1Name),
+		c.Query(param2Name),
+	}
+	if texts[0] == "" && texts[1] == "" {
+		c.String(http.StatusBadRequest, fmt.Sprintf(`parâmetros %q e %q são obrigatórios`, param1Name, param2Name))
 		return
 	}
-	texts := [2]string{text1, text2}
-	rects := [2]image.Rectangle{
-		{image.Point{X: 600, Y: 0}, image.Point{X: 1199, Y: 599}},
-		{image.Point{X: 600, Y: 600}, image.Point{X: 1199, Y: 1199}},
+	if texts[0] == "" {
+		c.String(http.StatusBadRequest, fmt.Sprintf(`parâmetro %q é obrigatório`, param1Name))
+		return
 	}
-	margin := 55
+	if texts[1] == "" {
+		c.String(http.StatusBadRequest, fmt.Sprintf(`parâmetro %q é obrigatório`, param2Name))
+		return
+	}
+
 	buffer, err := generateMeme(meme, texts, rects, margin)
 	if err != nil {
 		c.String(http.StatusInternalServerError, "generateMeme:", err)

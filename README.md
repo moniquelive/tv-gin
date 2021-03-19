@@ -8,24 +8,25 @@ Projeto de testes para testarmos algumas ideias como:
 
 # TO-DO's
 
-* extrair meme.go em um pacote a parte
-* mensagem para developers no console.log
-* centralizar verticalmente o texto nos boxes brancos
-* implementar testes
-* upload de outras imagens
-* parametros dos retangulos
-* numero de retangulo dinamico
+* [ ] estudar tags para compilar ora com embed ora com filesystem
+* [ ] extrair meme.go em um pacote a parte
+* [ ] mensagem para developers no console.log
+* [ ] centralizar verticalmente o texto nos boxes brancos
+* [ ] implementar testes
+* [ ] upload de outras imagens
+* [ ] parametros dos retangulos
+* [ ] numero de retangulo dinamico
 
 # DONE
 
-* ✅ criar uma pagina com um `<form>` pra chamar o `/meme`
-* ✅ fazer word-wrap, para quebrar textos grandes
-* ✅ usar um CNAME mais bacana (https://meme.monique.dev)
-* ✅ acertar layout para mobiles
-* ✅ fazer deploy no heroku usando docker e GO 1.16+
-* ✅ embedar os arquivos em static/
-* ✅ adicionar headers de opengraph
-* ✅ colocar créditos na imagem
+* [x] criar uma pagina com um `<form>` pra chamar o `/meme`
+* [x] fazer word-wrap, para quebrar textos grandes
+* [x] usar um CNAME mais bacana (https://meme.monique.dev)
+* [x] acertar layout para mobiles
+* [x] fazer deploy no heroku usando docker e GO 1.16+
+* [x] embedar os arquivos em static/
+* [x] adicionar headers de opengraph
+* [x] colocar créditos na imagem
 
 # Comandos para fazer deploy via docker no Heroku
 

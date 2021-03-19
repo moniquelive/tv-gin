@@ -37,7 +37,11 @@ func init() {
 	}
 }
 
-func generateMeme(memeBytes []byte, texts [2]string, rects [2]image.Rectangle, leftMargin int) (*bytes.Buffer, error) {
+func generateMeme(memeBytes []byte, texts [2]string, coords [2][4]int, leftMargin int) (*bytes.Buffer, error) {
+	rects := [2]image.Rectangle{
+		{image.Point{X: coords[0][0], Y: coords[0][1]}, image.Point{X: coords[0][2], Y: coords[0][3]}},
+		{image.Point{X: coords[1][0], Y: coords[1][1]}, image.Point{X: coords[1][2], Y: coords[1][3]}},
+	}
 	img, _, err := image.Decode(bytes.NewReader(memeBytes))
 	if err != nil {
 		return nil, fmt.Errorf("image.Decode: %w", err)
