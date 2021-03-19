@@ -1,7 +1,7 @@
 #-----------------------------------------------------------------------------
 FROM golang:alpine AS builder
 
-RUN apk add --no-cache upx binutils
+RUN apk add --no-cache upx
 
 ENV CGO_ENABLED=0 \
   GOOS=linux \
@@ -22,8 +22,7 @@ RUN go build \
       -o /go/bin/main \
       .
 
-RUN strip /go/bin/main
-RUN upx /go/bin/main
+RUN upx --lzma /go/bin/main
 
 #-----------------------------------------------------------------------------
 FROM scratch
