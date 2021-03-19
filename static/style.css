@@ -1,3 +1,7 @@
 .container {
     margin-top: 40px;
 }
+
+.github-fork-ribbon:before {
+    background-color: #343a40 !important;
+}
