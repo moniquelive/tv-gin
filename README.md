@@ -8,6 +8,7 @@ Projeto de testes para testarmos algumas ideias como:
 
 # TO-DO's
 
+* [ ] tamanho dinâmico da fonte 
 * [ ] estudar tags para compilar ora com embed ora com filesystem
 * [ ] extrair meme.go em um pacote a parte
 * [ ] mensagem para developers no console.log
