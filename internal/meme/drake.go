@@ -45,7 +45,7 @@ func (drake) Generate(texts []string) (*bytes.Buffer, error) {
 	fc := createFontContext(memeFont, memeFontSize, canvas.Bounds(), canvas, image.Black)
 
 	// Draw the text.
-	y := measureString(fc, memeFontSize, memeFontSpacing, wordWrap(texts[0], wordwrapWidth))
+	y := textHeight(fc, memeFontSize, memeFontSpacing, wordWrap(texts[0], wordwrapWidth))
 	rect0HalfHeight := rects[0].Dy() / 2
 	err = drawString(fc,
 		memeFontSize, memeFontSpacing,
@@ -56,7 +56,7 @@ func (drake) Generate(texts []string) (*bytes.Buffer, error) {
 		return nil, fmt.Errorf("drawString (1): %w", err)
 	}
 
-	y = measureString(fc, memeFontSize, memeFontSpacing, wordWrap(texts[1], wordwrapWidth))
+	y = textHeight(fc, memeFontSize, memeFontSpacing, wordWrap(texts[1], wordwrapWidth))
 	rect1HalfHeight := rects[1].Dy() / 2
 	err = drawString(fc,
 		memeFontSize, memeFontSpacing,

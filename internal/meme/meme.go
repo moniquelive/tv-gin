@@ -62,7 +62,8 @@ func createFontContext(ttFont *truetype.Font, fontSize float64, clipRectangle im
 
 func drawString(fc *freetype.Context, size, spacing float64, text []string, x, y int) error {
 	// Calculate the widths and print to image
-	pt := freetype.Pt(x, y+int(fc.PointToFixed(size)>>6))
+	fontHeight := int(fc.PointToFixed(size) >> 6)
+	pt := freetype.Pt(x, y+fontHeight)
 	for _, s := range text {
 		_, err := fc.DrawString(s, pt)
 		if err != nil {
@@ -88,9 +89,9 @@ func creditsWidthInPixels(f *truetype.Font, size float64, text string) int {
 	return width
 }
 
-func measureString(fc *freetype.Context, size, spacing float64, text []string) int {
+func textHeight(fc *freetype.Context, size, spacing float64, text []string) int {
 	return int(fc.PointToFixed(size)>>6) +
-		(len(text)-1)*(int(fc.PointToFixed(size*spacing))>>6)
+		(len(text)-1)*(int(fc.PointToFixed(size*spacing)>>6))
 }
 
 func wordWrap(text string, lineWidth int) (lines []string) {
