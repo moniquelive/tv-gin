@@ -8,7 +8,6 @@ Projeto de testes para testarmos algumas ideias como:
 
 # TO-DO's
 
-* [ ] centralizar verticalmente o texto nos boxes brancos
 * [ ] tamanho dinâmico da fonte
 * [ ] estudar tags para compilar ora com embed ora com filesystem
 * [ ] mensagem para developers no console.log
@@ -28,6 +27,7 @@ Projeto de testes para testarmos algumas ideias como:
 * [x] adicionar headers de opengraph
 * [x] colocar créditos na imagem
 * [x] extrair meme.go em um pacote a parte
+* [x] centralizar verticalmente o texto nos boxes brancos
 
 # Comandos para fazer deploy via docker no Heroku
 
