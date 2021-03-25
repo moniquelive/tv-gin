@@ -8,11 +8,10 @@ Projeto de testes para testarmos algumas ideias como:
 
 # TO-DO's
 
-* [ ] tamanho dinâmico da fonte 
-* [ ] estudar tags para compilar ora com embed ora com filesystem
-* [ ] extrair meme.go em um pacote a parte
-* [ ] mensagem para developers no console.log
+* [ ] tamanho dinâmico da fonte
 * [ ] centralizar verticalmente o texto nos boxes brancos
+* [ ] estudar tags para compilar ora com embed ora com filesystem
+* [ ] mensagem para developers no console.log
 * [ ] implementar testes
 * [ ] upload de outras imagens
 * [ ] parametros dos retangulos
@@ -28,6 +27,7 @@ Projeto de testes para testarmos algumas ideias como:
 * [x] embedar os arquivos em static/
 * [x] adicionar headers de opengraph
 * [x] colocar créditos na imagem
+* [x] extrair meme.go em um pacote a parte
 
 # Comandos para fazer deploy via docker no Heroku
 

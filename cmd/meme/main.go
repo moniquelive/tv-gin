@@ -1,6 +1,9 @@
 package main
 
 import (
+	"github.com/moniquelive/tv-gin/internal/meme"
+	"github.com/moniquelive/tv-gin/internal/utils"
+
 	"embed"
 	"fmt"
 	"log"
@@ -13,21 +16,10 @@ import (
 //go:embed static
 var f embed.FS
 
-//go:embed static/drake.jpg
-var meme []byte
-
-var (
-	rects = [2][4]int{
-		{600, 0, 1199, 599},
-		{600, 600, 1199, 1199},
-	}
-	margin = 55
-)
-
 var r = gin.Default()
 
 func init() {
-	r.Use(static.Serve("/", EmbedFolder(f, "static")))
+	r.Use(static.Serve("/", utils.EmbedFolder(f, "static")))
 	r.GET("/meme", memeHandler)
 }
 
@@ -40,7 +32,7 @@ func main() {
 func memeHandler(c *gin.Context) {
 	const param1Name = "text1"
 	const param2Name = "text2"
-	texts := [2]string{
+	texts := []string{
 		c.Query(param1Name),
 		c.Query(param2Name),
 	}
@@ -57,9 +49,15 @@ func memeHandler(c *gin.Context) {
 		return
 	}
 
-	buffer, err := generateMeme(meme, texts, rects, margin)
+	m, err := meme.New("drake")
 	if err != nil {
-		c.String(http.StatusInternalServerError, "generateMeme:", err)
+		c.String(http.StatusInternalServerError, fmt.Sprintf("generateMeme> %v", err))
+		return
+	}
+
+	buffer, err := m.Generate(texts)
+	if err != nil {
+		c.String(http.StatusInternalServerError, fmt.Sprintf("generateMeme> %v", err))
 		return
 	}
 	c.DataFromReader(http.StatusOK, int64(buffer.Len()), "image/jpeg", buffer, nil)

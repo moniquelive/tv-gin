@@ -20,7 +20,7 @@ RUN go build \
       -trimpath \
       -ldflags="-s -w -extldflags '-static'" \
       -o /go/bin/main \
-      .
+      ./cmd/meme
 
 RUN upx --lzma /go/bin/main
 

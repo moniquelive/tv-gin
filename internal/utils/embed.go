@@ -1,5 +1,5 @@
 // chupinhado daqui: https://github.com/gin-contrib/static/issues/19
-package main
+package utils
 
 import (
 	"embed"
