@@ -8,8 +8,8 @@ Projeto de testes para testarmos algumas ideias como:
 
 # TO-DO's
 
-* [ ] tamanho dinâmico da fonte
 * [ ] centralizar verticalmente o texto nos boxes brancos
+* [ ] tamanho dinâmico da fonte
 * [ ] estudar tags para compilar ora com embed ora com filesystem
 * [ ] mensagem para developers no console.log
 * [ ] implementar testes
