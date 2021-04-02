@@ -29,6 +29,7 @@ FROM scratch
 
 ENV GIN_MODE=release
 
+COPY testdata testdata
 COPY --from=builder /go/bin/main .
 
 ENTRYPOINT ["./main"]

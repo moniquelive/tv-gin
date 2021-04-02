@@ -49,13 +49,7 @@ func memeHandler(c *gin.Context) {
 		return
 	}
 
-	m, err := meme.New("drake")
-	if err != nil {
-		c.String(http.StatusInternalServerError, fmt.Sprintf("generateMeme> %v", err))
-		return
-	}
-
-	buffer, err := m.Generate(texts)
+	buffer, err := meme.Generate("drake", texts)
 	if err != nil {
 		c.String(http.StatusInternalServerError, fmt.Sprintf("generateMeme> %v", err))
 		return

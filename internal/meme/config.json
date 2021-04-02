@@ -1,0 +1,13 @@
+{
+  "memes": {
+    "drake": {
+      "name": "Drake Hotline Bling",
+      "filename": "drake.jpg",
+      "margin-left": 55,
+      "boxes": [
+        [600, 0, 1199, 599],
+        [600, 600, 1199, 1199]
+      ]
+    }
+  }
+}
