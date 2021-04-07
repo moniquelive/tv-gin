@@ -5,10 +5,12 @@ Projeto de testes para testarmos algumas ideias como:
 - framework gin-gonic
 - manipulação de imagens usando a biblioteca padrão de GO
 - deploy no heroku
+- motor de memes (json)
 
 # TO-DO's
 
-* [ ] parser de json com infos dos memes
+* [ ] text1 / text2 => text[]
+* [ ] segundo meme 🙏
 * [ ] tamanho dinâmico da fonte
 * [ ] estudar tags para compilar ora com embed ora com filesystem
 * [ ] mensagem para developers no console.log
@@ -29,6 +31,7 @@ Projeto de testes para testarmos algumas ideias como:
 * [x] colocar créditos na imagem
 * [x] extrair meme.go em um pacote a parte
 * [x] centralizar verticalmente o texto nos boxes brancos
+* [x] parser de json com infos dos memes
 
 # Comandos para fazer deploy via docker no Heroku
 

@@ -1,6 +1,7 @@
 {
-  "memes": {
-    "drake": {
+  "memes": [
+    {
+      "id": "drake",
       "name": "Drake Hotline Bling",
       "filename": "drake.jpg",
       "margin-left": 55,
@@ -8,6 +9,16 @@
         [600, 0, 1199, 599],
         [600, 600, 1199, 1199]
       ]
+    },
+    {
+      "id": "philo",
+      "name": "Philosoraptor",
+      "filename": "philosoraptor.jpg",
+      "margin-left": 55,
+      "boxes": [
+        [600, 0, 1199, 599],
+        [600, 600, 1199, 1199]
+      ]
     }
-  }
+  ]
 }

@@ -32,6 +32,18 @@
       <label for="text2" class="form-label">Segundo</label>
       <input type="text" name="text2" id="text2" class="form-control">
     </p>
+    <p>
+      <label for="meme" class="form-label">Escolha o meme</label>
+      <select name="meme" id="meme" class="form-control">
+        <optgroup label="Implementados">
+          {{ range .Memes }}
+          <option value="{{ .ID }}">{{ .Name }}</option>
+          {{ end }}
+        </optgroup>
+        <optgroup label="TODO's">
+        </optgroup>
+      </select>
+    </p>
     <button type="submit" class="btn btn-primary">Enviar</button>
   </form>
 </div>

@@ -29,6 +29,7 @@ FROM scratch
 
 ENV GIN_MODE=release
 
+COPY cmd/meme/static/index.tmpl cmd/meme/static/index.tmpl
 COPY testdata testdata
 COPY --from=builder /go/bin/main .
 

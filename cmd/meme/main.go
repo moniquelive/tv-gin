@@ -19,6 +19,12 @@ var f embed.FS
 var r = gin.Default()
 
 func init() {
+	r.LoadHTMLFiles("cmd/meme/static/index.tmpl")
+	r.GET("/", func(c *gin.Context) {
+		c.HTML(http.StatusOK, "index.tmpl", gin.H{
+			"Memes": meme.Config.Memes,
+		})
+	})
 	r.Use(static.Serve("/", utils.EmbedFolder(f, "static")))
 	r.GET("/meme", memeHandler)
 }

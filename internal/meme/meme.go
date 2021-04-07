@@ -31,14 +31,26 @@ var memeFont *truetype.Font
 var creditsFont *truetype.Font
 
 type meme struct {
+	ID         string   `json:"id"`
 	Name       string   `json:"name"`
 	Filename   string   `json:"filename"`
 	MarginLeft int      `json:"margin-left"`
 	Boxes      [][4]int `json:"boxes"`
 }
 
-var config struct {
-	Memes map[string]meme `json:"memes"`
+type config struct {
+	Memes []meme `json:"memes"`
+}
+
+var Config config
+
+func (c config) findMeme(name string) (*meme, error) {
+	for _, meme := range c.Memes {
+		if meme.ID == name {
+			return &meme, nil
+		}
+	}
+	return nil, fmt.Errorf("meme nao encontrado: %q", name)
 }
 
 func init() {
@@ -51,17 +63,17 @@ func init() {
 	if err != nil {
 		log.Fatalln(err)
 	}
-	err = json.Unmarshal(configJson, &config)
+	err = json.Unmarshal(configJson, &Config)
 	if err != nil {
 		log.Fatalln(err)
 	}
 }
 
 func Generate(name string, texts []string) (*bytes.Buffer, error) {
-	var meme meme
-	meme, ok := config.Memes[name]
-	if !ok {
-		return nil, fmt.Errorf("meme não encontrado: %q", name)
+	var meme *meme
+	meme, err := Config.findMeme(name)
+	if err != nil {
+		return nil, err
 	}
 	coords := meme.Boxes
 	rects := [2]image.Rectangle{
