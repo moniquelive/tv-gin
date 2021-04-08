@@ -4,6 +4,7 @@
       "id": "drake",
       "name": "Drake Hotline Bling",
       "filename": "img/drake.jpg",
+      "font-color": "#000",
       "margin-left": 55,
       "boxes": [
         [600, 0, 1199, 599],
@@ -14,6 +15,7 @@
       "id": "philo",
       "name": "Philosoraptor",
       "filename": "img/philosoraptor.jpg",
+      "font-color": "#fff",
       "margin-left": 55,
       "boxes": [
         [600, 0, 1199, 599],

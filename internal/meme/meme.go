@@ -1,6 +1,8 @@
 package meme
 
 import (
+	"github.com/moniquelive/tv-gin/internal/utils"
+
 	"bytes"
 	_ "embed"
 	"encoding/json"
@@ -34,6 +36,7 @@ type meme struct {
 	ID         string   `json:"id"`
 	Name       string   `json:"name"`
 	Filename   string   `json:"filename"`
+	FontColor  string   `json:"font-color"`
 	MarginLeft int      `json:"margin-left"`
 	Boxes      [][4]int `json:"boxes"`
 }
@@ -76,6 +79,14 @@ func (m meme) NumBoxes() int {
 	return len(m.Boxes)
 }
 
+func (m meme) FontRGBA() color.RGBA {
+	c, err := utils.ParseHexColor(m.FontColor)
+	if err != nil {
+		log.Panicf("FontRGBA> %v", err)
+	}
+	return c
+}
+
 func (m meme) Generate(texts []string) (*bytes.Buffer, error) {
 	coords := m.Boxes
 	rects := [2]image.Rectangle{
@@ -100,7 +111,7 @@ func (m meme) Generate(texts []string) (*bytes.Buffer, error) {
 		memeFontSpacing = 1
 		wordwrapWidth   = 13
 	)
-	fc := createFontContext(memeFont, memeFontSize, canvas.Bounds(), canvas, image.Black)
+	fc := createFontContext(memeFont, memeFontSize, canvas.Bounds(), canvas, m.FontRGBA())
 
 	// Draw the text.
 	y := textHeight(fc, memeFontSize, memeFontSpacing, wordWrap(texts[0], wordwrapWidth))
@@ -129,7 +140,7 @@ func (m meme) Generate(texts []string) (*bytes.Buffer, error) {
 		creditsFontSize = 32
 		creditsText     = "Esta imagem foi gerada no meme.monique.dev"
 	)
-	creditsFontColor := image.NewUniform(color.RGBA{R: 0xfe, G: 0x43, B: 0x65, A: 0xff})
+	creditsFontColor := color.RGBA{R: 0xfe, G: 0x43, B: 0x65, A: 0xff}
 	fc = createFontContext(creditsFont, creditsFontSize, canvas.Bounds(), canvas, creditsFontColor)
 	var (
 		creditsWidth      = creditsWidthInPixels(creditsFont, creditsFontSize, creditsText)
@@ -152,14 +163,14 @@ func (m meme) Generate(texts []string) (*bytes.Buffer, error) {
 	return &rw, nil
 }
 
-func createFontContext(ttFont *truetype.Font, fontSize float64, clipRectangle image.Rectangle, canvas *image.RGBA, color *image.Uniform) *freetype.Context {
+func createFontContext(ttFont *truetype.Font, fontSize float64, clipRectangle image.Rectangle, canvas *image.RGBA, color color.RGBA) *freetype.Context {
 	fc := freetype.NewContext()
 	fc.SetDPI(72)
 	fc.SetFont(ttFont)
 	fc.SetFontSize(fontSize)
 	fc.SetClip(clipRectangle)
 	fc.SetDst(canvas)
-	fc.SetSrc(color)
+	fc.SetSrc(image.NewUniform(color))
 	fc.SetHinting(font.HintingNone)
 	//fc.SetHinting(font.HintingFull)
 	return fc
