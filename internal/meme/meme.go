@@ -44,15 +44,6 @@ type config struct {
 
 var Config config
 
-func (c config) findMeme(name string) (*meme, error) {
-	for _, meme := range c.Memes {
-		if meme.ID == name {
-			return &meme, nil
-		}
-	}
-	return nil, fmt.Errorf("meme nao encontrado: %q", name)
-}
-
 func init() {
 	var err error
 	memeFont, err = freetype.ParseFont(fontBytes)
@@ -69,18 +60,29 @@ func init() {
 	}
 }
 
-func Generate(name string, texts []string) (*bytes.Buffer, error) {
-	var meme *meme
-	meme, err := Config.findMeme(name)
-	if err != nil {
-		return nil, err
+func (c config) FindMeme(name string) (*meme, error) {
+	if name == "" {
+		name = Config.Memes[0].ID
 	}
-	coords := meme.Boxes
+	for _, meme := range c.Memes {
+		if meme.ID == name {
+			return &meme, nil
+		}
+	}
+	return nil, fmt.Errorf("meme nao encontrado: %q", name)
+}
+
+func (m meme) NumBoxes() int {
+	return len(m.Boxes)
+}
+
+func (m meme) Generate(texts []string) (*bytes.Buffer, error) {
+	coords := m.Boxes
 	rects := [2]image.Rectangle{
 		{image.Point{X: coords[0][0], Y: coords[0][1]}, image.Point{X: coords[0][2], Y: coords[0][3]}},
 		{image.Point{X: coords[1][0], Y: coords[1][1]}, image.Point{X: coords[1][2], Y: coords[1][3]}},
 	}
-	f, err := os.Open("./testdata/" + meme.Filename)
+	f, err := os.Open("./web/" + m.Filename)
 	if err != nil {
 		return nil, fmt.Errorf("os.Open: %w", err)
 	}
@@ -106,7 +108,7 @@ func Generate(name string, texts []string) (*bytes.Buffer, error) {
 	err = drawString(fc,
 		memeFontSize, memeFontSpacing,
 		wordWrap(texts[0], wordwrapWidth),
-		rects[0].Min.X+meme.MarginLeft,
+		rects[0].Min.X+m.MarginLeft,
 		rects[0].Min.Y+rect0HalfHeight-y/2)
 	if err != nil {
 		return nil, fmt.Errorf("drawString (1): %w", err)
@@ -117,7 +119,7 @@ func Generate(name string, texts []string) (*bytes.Buffer, error) {
 	err = drawString(fc,
 		memeFontSize, memeFontSpacing,
 		wordWrap(texts[1], wordwrapWidth),
-		rects[1].Min.X+meme.MarginLeft,
+		rects[1].Min.X+m.MarginLeft,
 		rects[1].Min.Y+rect1HalfHeight-y/2)
 	if err != nil {
 		return nil, fmt.Errorf("drawString (2): %w", err)

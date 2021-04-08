@@ -3,7 +3,7 @@
     {
       "id": "drake",
       "name": "Drake Hotline Bling",
-      "filename": "drake.jpg",
+      "filename": "img/drake.jpg",
       "margin-left": 55,
       "boxes": [
         [600, 0, 1199, 599],
@@ -13,7 +13,7 @@
     {
       "id": "philo",
       "name": "Philosoraptor",
-      "filename": "philosoraptor.jpg",
+      "filename": "img/philosoraptor.jpg",
       "margin-left": 55,
       "boxes": [
         [600, 0, 1199, 599],

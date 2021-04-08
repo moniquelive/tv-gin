@@ -22,16 +22,8 @@
    target="_blank" data-ribbon="Fork me on GitHub"
    title="Fork me on GitHub">Fork me on GitHub</a>
 <div class="container">
-  <h1>Escolha duas frases:</h1>
+  <h1>Escolha o Meme:</h1>
   <form action="/meme" method="get">
-    <p>
-      <label for="text1" class="form-label">Primeiro</label>
-      <input type="text" name="text1" id="text1" class="form-control">
-    </p>
-    <p>
-      <label for="text2" class="form-label">Segundo</label>
-      <input type="text" name="text2" id="text2" class="form-control">
-    </p>
     <p>
       <label for="meme" class="form-label">Escolha o meme</label>
       <select name="meme" id="meme" class="form-control">
@@ -43,6 +35,14 @@
         <optgroup label="TODO's">
         </optgroup>
       </select>
+    </p>
+    <p>
+      <label for="text1" class="form-label">Primeiro</label>
+      <input type="text" name="text[]" id="text1" class="form-control">
+    </p>
+    <p>
+      <label for="text2" class="form-label">Segundo</label>
+      <input type="text" name="text[]" id="text2" class="form-control">
     </p>
     <button type="submit" class="btn btn-primary">Enviar</button>
   </form>

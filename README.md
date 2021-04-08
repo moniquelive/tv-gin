@@ -10,8 +10,11 @@ Projeto de testes para testarmos algumas ideias como:
 # TO-DO's
 
 * [ ] text1 / text2 => text[]
-* [ ] segundo meme 🙏
+* [ ] config.json: estilo da fonte (cor de stroke / cor de fill)
+* [ ] config.json: cor da fonte
+* [ ] config.json: align: center/left/right
 * [ ] tamanho dinâmico da fonte
+* [ ] segundo meme 🙏
 * [ ] estudar tags para compilar ora com embed ora com filesystem
 * [ ] mensagem para developers no console.log
 * [ ] implementar testes

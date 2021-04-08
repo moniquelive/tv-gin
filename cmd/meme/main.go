@@ -2,9 +2,7 @@ package main
 
 import (
 	"github.com/moniquelive/tv-gin/internal/meme"
-	"github.com/moniquelive/tv-gin/internal/utils"
 
-	"embed"
 	"fmt"
 	"log"
 	"net/http"
@@ -13,19 +11,16 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-//go:embed static
-var f embed.FS
-
 var r = gin.Default()
 
 func init() {
-	r.LoadHTMLFiles("cmd/meme/static/index.tmpl")
+	r.LoadHTMLFiles("web/index.tmpl")
 	r.GET("/", func(c *gin.Context) {
 		c.HTML(http.StatusOK, "index.tmpl", gin.H{
 			"Memes": meme.Config.Memes,
 		})
 	})
-	r.Use(static.Serve("/", utils.EmbedFolder(f, "static")))
+	r.Use(static.Serve("/", static.LocalFile("web", false)))
 	r.GET("/meme", memeHandler)
 }
 
@@ -36,26 +31,23 @@ func main() {
 }
 
 func memeHandler(c *gin.Context) {
-	const param1Name = "text1"
-	const param2Name = "text2"
-	texts := []string{
-		c.Query(param1Name),
-		c.Query(param2Name),
-	}
-	if texts[0] == "" && texts[1] == "" {
-		c.String(http.StatusBadRequest, fmt.Sprintf(`parâmetros %q e %q são obrigatórios`, param1Name, param2Name))
+	const paramMeme = "meme"
+	const paramTexts = "text[]"
+	memeName := c.Query(paramMeme)
+	textsVal := c.QueryArray(paramTexts)
+	theMeme, err := meme.Config.FindMeme(memeName)
+	if err != nil {
+		c.String(http.StatusInternalServerError, fmt.Sprintf("FindMeme> %v", err))
 		return
 	}
-	if texts[0] == "" {
-		c.String(http.StatusBadRequest, fmt.Sprintf(`parâmetro %q é obrigatório`, param1Name))
+	if len(textsVal) != theMeme.NumBoxes() {
+		c.String(http.StatusBadRequest,
+			fmt.Sprintf(`Precisamos de %d linhas de texto! %d recebida(s)...`,
+				theMeme.NumBoxes(),
+				len(textsVal)))
 		return
 	}
-	if texts[1] == "" {
-		c.String(http.StatusBadRequest, fmt.Sprintf(`parâmetro %q é obrigatório`, param2Name))
-		return
-	}
-
-	buffer, err := meme.Generate("drake", texts)
+	buffer, err := theMeme.Generate(textsVal)
 	if err != nil {
 		c.String(http.StatusInternalServerError, fmt.Sprintf("generateMeme> %v", err))
 		return
