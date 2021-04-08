@@ -5,6 +5,7 @@
       "name": "Drake Hotline Bling",
       "filename": "img/drake.jpg",
       "font-color": "#000",
+      "line-chars": 13,
       "margin-left": 55,
       "boxes": [
         [600, 0, 1199, 599],
@@ -16,10 +17,11 @@
       "name": "Philosoraptor",
       "filename": "img/philosoraptor.jpg",
       "font-color": "#fff",
+      "line-chars": 34,
       "margin-left": 55,
       "boxes": [
-        [600, 0, 1199, 599],
-        [600, 600, 1199, 1199]
+        [0, 0, 1399, 349],
+        [0, 900, 1399, 1399]
       ]
     }
   ]

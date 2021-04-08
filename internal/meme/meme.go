@@ -37,6 +37,7 @@ type meme struct {
 	Name       string   `json:"name"`
 	Filename   string   `json:"filename"`
 	FontColor  string   `json:"font-color"`
+	LineChars  int      `json:"line-chars"`
 	MarginLeft int      `json:"margin-left"`
 	Boxes      [][4]int `json:"boxes"`
 }
@@ -106,30 +107,35 @@ func (m meme) Generate(texts []string) (*bytes.Buffer, error) {
 	canvas := image.NewRGBA(img.Bounds())
 	draw.Draw(canvas, canvas.Bounds(), img, img.Bounds().Min, draw.Src)
 
+	// DEBUG!
+	//red := color.RGBA{R: 255, G: 0, B: 0, A: 255}
+	//for _, r := range m.Boxes {
+	//	utils.Rect(canvas, red, r[0], r[1], r[2], r[3])
+	//}
+
 	const (
 		memeFontSize    = 64
 		memeFontSpacing = 1
-		wordwrapWidth   = 13
 	)
 	fc := createFontContext(memeFont, memeFontSize, canvas.Bounds(), canvas, m.FontRGBA())
 
 	// Draw the text.
-	y := textHeight(fc, memeFontSize, memeFontSpacing, wordWrap(texts[0], wordwrapWidth))
+	y := textHeight(fc, memeFontSize, memeFontSpacing, wordWrap(texts[0], m.LineChars))
 	rect0HalfHeight := rects[0].Dy() / 2
 	err = drawString(fc,
 		memeFontSize, memeFontSpacing,
-		wordWrap(texts[0], wordwrapWidth),
+		wordWrap(texts[0], m.LineChars),
 		rects[0].Min.X+m.MarginLeft,
 		rects[0].Min.Y+rect0HalfHeight-y/2)
 	if err != nil {
 		return nil, fmt.Errorf("drawString (1): %w", err)
 	}
 
-	y = textHeight(fc, memeFontSize, memeFontSpacing, wordWrap(texts[1], wordwrapWidth))
+	y = textHeight(fc, memeFontSize, memeFontSpacing, wordWrap(texts[1], m.LineChars))
 	rect1HalfHeight := rects[1].Dy() / 2
 	err = drawString(fc,
 		memeFontSize, memeFontSpacing,
-		wordWrap(texts[1], wordwrapWidth),
+		wordWrap(texts[1], m.LineChars),
 		rects[1].Min.X+m.MarginLeft,
 		rects[1].Min.Y+rect1HalfHeight-y/2)
 	if err != nil {
