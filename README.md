@@ -9,15 +9,15 @@ Projeto de testes para testarmos algumas ideias como:
 
 # TO-DO's
 
-* [ ] config.json: estilo da fonte (cor de stroke / cor de fill)
 * [ ] config.json: align: center/left/right
+* [ ] config.json: estilo da fonte (cor de stroke / cor de fill)
 * [ ] tamanho dinâmico da fonte
+* [ ] numero de retangulo dinamico
+---
 * [ ] estudar tags para compilar ora com embed ora com filesystem
 * [ ] mensagem para developers no console.log
 * [ ] implementar testes
-* [ ] upload de outras imagens
-* [ ] parametros dos retangulos
-* [ ] numero de retangulo dinamico
+* [ ] (?) upload de outras imagens
 
 # DONE
 
@@ -34,6 +34,7 @@ Projeto de testes para testarmos algumas ideias como:
 * [x] parser de json com infos dos memes
 * [x] text1 / text2 => text[]
 * [x] config.json: cor da fonte
+* [x] config.json: parametros dos retangulos
 * [x] segundo meme 🙏
 
 # Comandos para fazer deploy via docker no Heroku

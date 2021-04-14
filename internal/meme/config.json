@@ -18,7 +18,7 @@
       "filename": "img/philosoraptor.jpg",
       "font-color": "#fff",
       "line-chars": 34,
-      "margin-left": 55,
+      "text-align": "center",
       "boxes": [
         [0, 0, 1399, 349],
         [0, 900, 1399, 1399]
@@ -29,8 +29,8 @@
       "name": "Standup Dino",
       "filename": "img/standup-dino.png",
       "font-color": "#fff",
-      "line-chars": 34,
-      "margin-left": 10,
+      "line-chars": 10,
+      "text-align": "center",
       "boxes": [
         [0, 0, 370, 100],
         [390, 0, 745, 100]
