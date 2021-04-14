@@ -11,13 +11,15 @@ import (
 	"image/color"
 	"image/draw"
 	"image/jpeg"
+	_ "image/png"
 	"log"
 	"os"
 	"strings"
 
+	"golang.org/x/image/font"
+
 	"github.com/golang/freetype"
 	"github.com/golang/freetype/truetype"
-	"golang.org/x/image/font"
 )
 
 //go:embed jetbrains.ttf

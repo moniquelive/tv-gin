@@ -23,6 +23,18 @@
         [0, 0, 1399, 349],
         [0, 900, 1399, 1399]
       ]
+    },
+    {
+      "id": "standup-dino",
+      "name": "Standup Dino",
+      "filename": "img/standup-dino.png",
+      "font-color": "#fff",
+      "line-chars": 34,
+      "margin-left": 10,
+      "boxes": [
+        [0, 0, 370, 100],
+        [390, 0, 745, 100]
+      ]
     }
   ]
 }
