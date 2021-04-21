@@ -109,25 +109,25 @@ func (m meme) Generate(texts []string) (*bytes.Buffer, error) {
 	draw.Draw(canvas, canvas.Bounds(), img, img.Bounds().Min, draw.Src)
 
 	// DEBUG!
-	//red := color.RGBA{R: 255, G: 0, B: 0, A: 255}
-	//for _, r := range m.Boxes {
-	//	utils.Rect(canvas, red, r[0], r[1], r[2], r[3])
-	//}
+	// red := color.RGBA{R: 255, G: 0, B: 0, A: 255}
+	// for _, r := range m.Boxes {
+	// 	utils.Rect(canvas, red, r[0], r[1], r[2], r[3])
+	// }
 
-	const (
-		memeFontSize    = 64
-		memeFontSpacing = 1
-	)
+	const fontSpacing = 1
+
+	// LINE 1 ------------------------------------------------------------------------------
+	wrap := wordWrap(texts[0], m.LineChars)
+	memeFontSize := utils.CalcMonoFontSize(memeFont, fontSpacing, wrap, rects[0])
 	fc := utils.CreateFontContext(memeFont, memeFontSize, canvas.Bounds(), canvas, m.FontRGBA())
 
 	// Draw the text.
-	wrap := wordWrap(texts[0], m.LineChars)
-	y := utils.TextHeight(fc, memeFontSize, memeFontSpacing, wrap)
+	y := utils.TextHeight(fc, memeFontSize, fontSpacing, wrap)
 	rect0HalfHeight := rects[0].Dy() / 2
 	err = utils.DrawString(fc,
 		memeFont, memeFontSize, rects[0],
 		m.TextAlign,
-		memeFontSpacing,
+		fontSpacing,
 		wrap,
 		rects[0].Min.X+m.MarginLeft,
 		rects[0].Min.Y+rect0HalfHeight-y/2)
@@ -135,13 +135,17 @@ func (m meme) Generate(texts []string) (*bytes.Buffer, error) {
 		return nil, fmt.Errorf("DrawString (1): %w", err)
 	}
 
+	// LINE 2 ------------------------------------------------------------------------------
 	wrap = wordWrap(texts[1], m.LineChars)
-	y = utils.TextHeight(fc, memeFontSize, memeFontSpacing, wrap)
+	memeFontSize = utils.CalcMonoFontSize(memeFont, fontSpacing, wrap, rects[1])
+	fc = utils.CreateFontContext(memeFont, memeFontSize, canvas.Bounds(), canvas, m.FontRGBA())
+
+	y = utils.TextHeight(fc, memeFontSize, fontSpacing, wrap)
 	rect1HalfHeight := rects[1].Dy() / 2
 	err = utils.DrawString(fc,
 		memeFont, memeFontSize, rects[1],
 		m.TextAlign,
-		memeFontSpacing,
+		fontSpacing,
 		wrap,
 		rects[1].Min.X+m.MarginLeft,
 		rects[1].Min.Y+rect1HalfHeight-y/2)
@@ -157,14 +161,14 @@ func (m meme) Generate(texts []string) (*bytes.Buffer, error) {
 	fc = utils.CreateFontContext(creditsFont, creditsFontSize, canvas.Bounds(), canvas, creditsFontColor)
 	var (
 		creditsWidth      = utils.TextWidthInPixels(creditsFont, creditsFontSize, creditsText)
-		creditsX          = canvas.Bounds().Max.X - creditsWidth - creditsFontSize
+		creditsX          = canvas.Bounds().Max.X - creditsWidth - 12
 		creditsFontHeight = int(fc.PointToFixed(creditsFontSize) >> 6)
-		creditsY          = canvas.Bounds().Max.Y - creditsFontHeight*2 - creditsFontSize/4
+		creditsY          = canvas.Bounds().Max.Y - int(float64(creditsFontHeight)*1.5)
 	)
 	err = utils.DrawString(fc,
-		creditsFont, memeFontSize, canvas.Bounds(),
+		creditsFont, creditsFontSize, canvas.Bounds(),
 		"",
-		memeFontSpacing,
+		fontSpacing,
 		[]string{creditsText},
 		creditsX, creditsY)
 	if err != nil {

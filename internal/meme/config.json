@@ -6,7 +6,6 @@
       "filename": "img/drake.jpg",
       "font-color": "#000",
       "line-chars": 13,
-      "margin-left": 55,
       "boxes": [
         [600, 0, 1199, 599],
         [600, 600, 1199, 1199]
@@ -29,7 +28,7 @@
       "name": "Standup Dino",
       "filename": "img/standup-dino.png",
       "font-color": "#fff",
-      "line-chars": 10,
+      "line-chars": 20,
       "text-align": "center",
       "boxes": [
         [0, 0, 370, 100],

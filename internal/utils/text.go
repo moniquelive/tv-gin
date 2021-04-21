@@ -4,6 +4,7 @@ import (
 	"image"
 	"image/color"
 	"log"
+	"math"
 	"strings"
 
 	"golang.org/x/image/font"
@@ -62,9 +63,9 @@ func align(alignment string, width int, clipRectangle image.Rectangle, pt fixed.
 	return fixed.Point26_6{X: x, Y: y}
 }
 
-func TextHeight(fc *freetype.Context, size, spacing float64, text []string) int {
+func TextHeight(fc *freetype.Context, size, spacing float64, lines []string) int {
 	return int(fc.PointToFixed(size)>>6) +
-		(len(text)-1)*(int(fc.PointToFixed(size*spacing)>>6))
+		(len(lines)-1)*(int(fc.PointToFixed(size*spacing)>>6))
 }
 
 func TextWidthInPixels(f *truetype.Font, size float64, text string) int {
@@ -74,9 +75,36 @@ func TextWidthInPixels(f *truetype.Font, size float64, text string) int {
 	face := truetype.NewFace(f, &opts)
 	width := 0
 	for _, x := range text {
-		awidth, _ := face.GlyphAdvance(x)
-		iwidthf := int(float64(awidth) / 64)
-		width += iwidthf
+		_, a, ok := face.GlyphBounds(x)
+		if !ok {
+			panic("Huh?")
+		}
+		width += a.Round()
 	}
 	return width
+}
+
+// CalcMonoFontSize calcula o tamanho maximo da fonte usada no bloco de texto para caber em bounds.
+func CalcMonoFontSize(f *truetype.Font, spacing float64, wrap []string, bounds image.Rectangle) float64 {
+	boundsHeight := bounds.Dy()
+	boundsWidth := bounds.Dx()
+	fc := freetype.NewContext()
+
+	currSize := 384.0
+	for {
+		opts := truetype.Options{Size: currSize}
+		face := truetype.NewFace(f, &opts)
+		_, a, _ := face.GlyphBounds(' ')
+		charWidthInPixels := a.Round()
+
+		height := TextHeight(fc, currSize, spacing, wrap)
+		maxWidth := float64(0)
+		for _, w := range wrap {
+			maxWidth = math.Max(maxWidth, float64(len(w)*charWidthInPixels))
+		}
+		if height < boundsHeight && maxWidth < float64(boundsWidth) {
+			return currSize
+		}
+		currSize -= 10
+	}
 }
