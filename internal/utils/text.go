@@ -14,6 +14,16 @@ import (
 	"github.com/golang/freetype/truetype"
 )
 
+var allSizes []int
+
+func init() {
+	allSizes = make([]int, 256)
+	for i := 0; i < 256; i++ {
+		allSizes[i] = i + 1
+	}
+
+}
+
 func CreateFontContext(ttFont *truetype.Font, fontSize float64, clipRectangle image.Rectangle, canvas *image.RGBA, color color.RGBA) *freetype.Context {
 	fc := freetype.NewContext()
 	fc.SetDPI(72)
@@ -85,26 +95,31 @@ func TextWidthInPixels(f *truetype.Font, size float64, text string) int {
 }
 
 // CalcMonoFontSize calcula o tamanho maximo da fonte usada no bloco de texto para caber em bounds.
-func CalcMonoFontSize(f *truetype.Font, spacing float64, wrap []string, bounds image.Rectangle) float64 {
-	boundsHeight := bounds.Dy()
-	boundsWidth := bounds.Dx()
-	fc := freetype.NewContext()
+func CalcMonoFontSize(f *truetype.Font, spacing float64, wrap []string, bounds image.Rectangle) int {
+	return recCalcMonoFontSize(freetype.NewContext(), allSizes, f, spacing, wrap, bounds)
+}
 
-	currSize := 384.0
-	for {
-		opts := truetype.Options{Size: currSize}
-		face := truetype.NewFace(f, &opts)
-		_, a, _ := face.GlyphBounds(' ')
-		charWidthInPixels := a.Round()
+func recCalcMonoFontSize(fc *freetype.Context, sizes []int, f *truetype.Font, spacing float64, wrap []string, bounds image.Rectangle) int {
+	//fmt.Println(sizes)
+	currSize := sizes[len(sizes)/2]
+	opts := truetype.Options{Size: float64(currSize)}
+	face := truetype.NewFace(f, &opts)
+	_, a, _ := face.GlyphBounds(' ')
+	charWidthInPixels := a.Round()
 
-		height := TextHeight(fc, currSize, spacing, wrap)
-		maxWidth := float64(0)
-		for _, w := range wrap {
-			maxWidth = math.Max(maxWidth, float64(len(w)*charWidthInPixels))
-		}
-		if height < boundsHeight && maxWidth < float64(boundsWidth) {
-			return currSize
-		}
-		currSize -= 10
+	height := TextHeight(fc, float64(currSize), spacing, wrap)
+	maxWidth := float64(0)
+	for _, w := range wrap {
+		maxWidth = math.Max(maxWidth, float64(len(w)*charWidthInPixels))
+	}
+	if len(sizes) == 1 {
+		return sizes[0]
+	}
+	if height > bounds.Dy() || maxWidth > float64(bounds.Dx()) {
+		firstHalf := sizes[0 : len(sizes)/2]
+		return recCalcMonoFontSize(fc, firstHalf, f, spacing, wrap, bounds)
+	} else {
+		secondHalf := sizes[len(sizes)/2:]
+		return recCalcMonoFontSize(fc, secondHalf, f, spacing, wrap, bounds)
 	}
 }

@@ -118,7 +118,7 @@ func (m meme) Generate(texts []string) (*bytes.Buffer, error) {
 
 	// LINE 1 ------------------------------------------------------------------------------
 	wrap := wordWrap(texts[0], m.LineChars)
-	memeFontSize := utils.CalcMonoFontSize(memeFont, fontSpacing, wrap, rects[0])
+	memeFontSize := float64(utils.CalcMonoFontSize(memeFont, fontSpacing, wrap, rects[0]))
 	fc := utils.CreateFontContext(memeFont, memeFontSize, canvas.Bounds(), canvas, m.FontRGBA())
 
 	// Draw the text.
@@ -137,7 +137,7 @@ func (m meme) Generate(texts []string) (*bytes.Buffer, error) {
 
 	// LINE 2 ------------------------------------------------------------------------------
 	wrap = wordWrap(texts[1], m.LineChars)
-	memeFontSize = utils.CalcMonoFontSize(memeFont, fontSpacing, wrap, rects[1])
+	memeFontSize = float64(utils.CalcMonoFontSize(memeFont, fontSpacing, wrap, rects[1]))
 	fc = utils.CreateFontContext(memeFont, memeFontSize, canvas.Bounds(), canvas, m.FontRGBA())
 
 	y = utils.TextHeight(fc, memeFontSize, fontSpacing, wrap)
