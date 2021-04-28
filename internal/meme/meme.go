@@ -91,9 +91,12 @@ func (m meme) FontRGBA() color.RGBA {
 
 func (m meme) Generate(texts []string) (*bytes.Buffer, error) {
 	coords := m.Boxes
-	rects := [2]image.Rectangle{
-		{image.Point{X: coords[0][0], Y: coords[0][1]}, image.Point{X: coords[0][2], Y: coords[0][3]}},
-		{image.Point{X: coords[1][0], Y: coords[1][1]}, image.Point{X: coords[1][2], Y: coords[1][3]}},
+	rects := make([]image.Rectangle, len(m.Boxes))
+	for i := 0; i < len(m.Boxes); i++ {
+		rects[i] = image.Rectangle{
+			Min: image.Point{X: coords[i][0], Y: coords[i][1]},
+			Max: image.Point{X: coords[i][2], Y: coords[i][3]},
+		}
 	}
 	f, err := os.Open("./web/" + m.Filename)
 	if err != nil {
@@ -109,48 +112,30 @@ func (m meme) Generate(texts []string) (*bytes.Buffer, error) {
 	draw.Draw(canvas, canvas.Bounds(), img, img.Bounds().Min, draw.Src)
 
 	// DEBUG!
-	// red := color.RGBA{R: 255, G: 0, B: 0, A: 255}
-	// for _, r := range m.Boxes {
-	// 	utils.Rect(canvas, red, r[0], r[1], r[2], r[3])
-	// }
+	//red := color.RGBA{R: 255, G: 0, B: 0, A: 255}
+	//for _, r := range m.Boxes {
+	//	utils.Rect(canvas, red, r[0], r[1], r[2], r[3])
+	//}
 
 	const fontSpacing = 1
+	for i := 0; i < len(m.Boxes); i++ {
+		wrap := wordWrap(texts[i], m.LineChars)
+		memeFontSize := float64(utils.CalcMonoFontSize(memeFont, fontSpacing, wrap, rects[i]))
+		fc := utils.CreateFontContext(memeFont, memeFontSize, canvas.Bounds(), canvas, m.FontRGBA())
 
-	// LINE 1 ------------------------------------------------------------------------------
-	wrap := wordWrap(texts[0], m.LineChars)
-	memeFontSize := float64(utils.CalcMonoFontSize(memeFont, fontSpacing, wrap, rects[0]))
-	fc := utils.CreateFontContext(memeFont, memeFontSize, canvas.Bounds(), canvas, m.FontRGBA())
-
-	// Draw the text.
-	y := utils.TextHeight(fc, memeFontSize, fontSpacing, wrap)
-	rect0HalfHeight := rects[0].Dy() / 2
-	err = utils.DrawString(fc,
-		memeFont, memeFontSize, rects[0],
-		m.TextAlign,
-		fontSpacing,
-		wrap,
-		rects[0].Min.X+m.MarginLeft,
-		rects[0].Min.Y+rect0HalfHeight-y/2)
-	if err != nil {
-		return nil, fmt.Errorf("DrawString (1): %w", err)
-	}
-
-	// LINE 2 ------------------------------------------------------------------------------
-	wrap = wordWrap(texts[1], m.LineChars)
-	memeFontSize = float64(utils.CalcMonoFontSize(memeFont, fontSpacing, wrap, rects[1]))
-	fc = utils.CreateFontContext(memeFont, memeFontSize, canvas.Bounds(), canvas, m.FontRGBA())
-
-	y = utils.TextHeight(fc, memeFontSize, fontSpacing, wrap)
-	rect1HalfHeight := rects[1].Dy() / 2
-	err = utils.DrawString(fc,
-		memeFont, memeFontSize, rects[1],
-		m.TextAlign,
-		fontSpacing,
-		wrap,
-		rects[1].Min.X+m.MarginLeft,
-		rects[1].Min.Y+rect1HalfHeight-y/2)
-	if err != nil {
-		return nil, fmt.Errorf("DrawString (2): %w", err)
+		// Draw the text.
+		y := utils.TextHeight(fc, memeFontSize, fontSpacing, wrap)
+		rectHalfHeight := rects[i].Dy() / 2
+		err = utils.DrawString(fc,
+			memeFont, memeFontSize, rects[i],
+			m.TextAlign,
+			fontSpacing,
+			wrap,
+			rects[i].Min.X+m.MarginLeft,
+			rects[i].Min.Y+rectHalfHeight-y/2)
+		if err != nil {
+			return nil, fmt.Errorf("DrawString (1): %w", err)
+		}
 	}
 
 	const (
@@ -158,7 +143,7 @@ func (m meme) Generate(texts []string) (*bytes.Buffer, error) {
 		creditsText     = "Esta imagem foi gerada no meme.monique.dev"
 	)
 	creditsFontColor := color.RGBA{R: 0xfe, G: 0x43, B: 0x65, A: 0xff}
-	fc = utils.CreateFontContext(creditsFont, creditsFontSize, canvas.Bounds(), canvas, creditsFontColor)
+	fc := utils.CreateFontContext(creditsFont, creditsFontSize, canvas.Bounds(), canvas, creditsFontColor)
 	var (
 		creditsWidth      = utils.TextWidthInPixels(creditsFont, creditsFontSize, creditsText)
 		creditsX          = canvas.Bounds().Max.X - creditsWidth - 12

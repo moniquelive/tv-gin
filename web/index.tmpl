@@ -23,32 +23,48 @@
    title="Fork me on GitHub">Fork me on GitHub</a>
 <div class="container">
   <h1>Escolha o Meme:</h1>
-  <form action="/meme" method="get">
+  <form action="/meme" method="get" autocomplete="off">
     <p>
       <label for="meme" class="form-label">Escolha o meme</label>
       <select name="meme" id="meme" class="form-control">
         <optgroup label="Implementados">
           {{ range .Memes }}
-          <option value="{{ .ID }}">{{ .Name }}</option>
+          <option value="{{ .ID }}" data-text-boxes="{{ len .Boxes }}">{{ .Name }}</option>
           {{ end }}
-        </optgroup>
-        <optgroup label="TODO's">
         </optgroup>
       </select>
     </p>
-    <p>
-      <label for="text1" class="form-label">Primeiro</label>
-      <input type="text" name="text[]" id="text1" class="form-control">
-    </p>
-    <p>
-      <label for="text2" class="form-label">Segundo</label>
-      <input type="text" name="text[]" id="text2" class="form-control">
-    </p>
+    <p></p>
     <button type="submit" class="btn btn-primary">Enviar</button>
   </form>
 </div>
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0-beta2/dist/js/bootstrap.bundle.min.js"
         integrity="sha384-b5kHyXgcpbZJO/tY9Ul7kGkf1S0CWuKcCD38l8YkeH8z8QjE0GmW1gYU5S9FOnJ0"
         crossorigin="anonymous"></script>
+<script>
+  const elForm = document.getElementsByTagName("form")[0]
+  const elSelect = document.getElementsByTagName("select")[0]
+  const elP = elForm.childNodes[3]
+  const extenso = ["Primeiro", "Segundo", "Terceiro", "Quarto"]
+  elSelect.onchange = (e) => {
+      elP.innerHTML = ""
+      const numBoxes = parseInt(e.target.selectedOptions[0].dataset.textBoxes)
+      for (let i = 0; i < numBoxes; i++) {
+          const elInput = document.createElement("input")
+          elInput.type = "text"
+          elInput.name = "text[]"
+          elInput.id = "text" + (i + 1)
+          elInput.className = "form-control"
+
+          const elLabel = document.createElement("label")
+          elLabel.innerText = extenso[i]
+          elLabel.htmlFor = elInput.id
+
+          elP.appendChild(elLabel)
+          elP.appendChild(elInput)
+      }
+  }
+  elSelect.dispatchEvent(new Event('change'))
+</script>
 </body>
 </html>
