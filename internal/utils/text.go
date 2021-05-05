@@ -79,19 +79,9 @@ func TextHeight(fc *freetype.Context, size, spacing float64, lines []string) int
 }
 
 func TextWidthInPixels(f *truetype.Font, size float64, text string) int {
-	opts := truetype.Options{
-		Size: size,
-	}
+	opts := truetype.Options{Size: size}
 	face := truetype.NewFace(f, &opts)
-	width := 0
-	for _, x := range text {
-		_, a, ok := face.GlyphBounds(x)
-		if !ok {
-			panic("Huh?")
-		}
-		width += a.Round()
-	}
-	return width
+	return font.MeasureString(face, text).Floor()
 }
 
 // CalcMonoFontSize calcula o tamanho maximo da fonte usada no bloco de texto para caber em bounds.

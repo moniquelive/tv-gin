@@ -12,7 +12,6 @@ Projeto de testes para testarmos algumas ideias como:
 * [ ] fazer largura do texto (wordwrap) proporcional(?)
 * [ ] config.json: align: center/left/right
 * [ ] config.json: estilo da fonte (cor de stroke / cor de fill)
-* [ ] numero de retangulo dinamico
 ---
 * [ ] estudar tags para compilar ora com embed ora com filesystem
 * [ ] mensagem para developers no console.log
@@ -37,6 +36,7 @@ Projeto de testes para testarmos algumas ideias como:
 * [x] config.json: parametros dos retangulos
 * [x] segundo meme 🙏
 * [x] tamanho dinâmico da fonte
+* [x] numero de retangulo dinamico
 
 # Comandos para fazer deploy via docker no Heroku
 
