@@ -1,0 +1,50 @@
+version: "3.8"
+
+services:
+  traefik:
+    image: traefik:v2.4
+    command:
+      - "--api.dashboard=true"
+      - "--entrypoints.web.address=:80"
+      - "--entrypoints.websecure.address=:443"
+      - "--providers.docker=true"
+      - "--providers.docker.network=traefik_default"
+      - "--providers.docker.exposedbydefault=false"
+      - "--providers.docker.swarmmode=true"
+      - "--certificatesresolvers.leresolver.acme.email=le-swarm@moniquelive.com"
+      - "--certificatesresolvers.leresolver.acme.storage=/letsencrypt/acme.json"
+      - "--certificatesresolvers.leresolver.acme.httpChallenge.entrypoint=web"
+
+    ports:
+      - 80:80
+      - 443:443
+
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+      - /var/local/traefik/letsencrypt:/letsencrypt
+
+    deploy:
+      labels:
+        - "traefik.enable=true"
+
+        - "traefik.http.services.traefik.loadbalancer.server.port=888" # required by swarm but not used.
+
+        # global redirect to https
+        - "traefik.http.routers.http-catchall.rule=hostregexp(`{host:.+}`)"
+        - "traefik.http.routers.http-catchall.entrypoints=web"
+        - "traefik.http.routers.http-catchall.middlewares=redirect-to-https"
+
+        # middleware redirect
+        - "traefik.http.middlewares.redirect-to-https.redirectscheme.scheme=https"
+
+        # dashboard
+        - "traefik.http.routers.traefik.tls=true"
+        - "traefik.http.routers.traefik.entrypoints=websecure"
+        - "traefik.http.routers.traefik.service=api@internal"
+        - "traefik.http.routers.traefik.middlewares=authtraefik"
+        - "traefik.docker.lbswarm=true"
+        - "traefik.http.routers.traefik.rule=Host(`swarm.monique.dev`)"
+        - "traefik.http.routers.traefik.tls.certresolver=leresolver"
+        # docker secret create basicauth.conf basicauth.conf
+        # docker service update --secret-add=basicauth.conf traefik_traefik
+        - "traefik.http.middlewares.authtraefik.basicauth.usersfile=/run/secrets/basicauth.conf"

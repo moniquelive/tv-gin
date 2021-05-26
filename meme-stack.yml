@@ -1,0 +1,22 @@
+version: "3.8"
+
+networks:
+  traefik_default:
+    external: true
+
+services:
+  meme:
+    image: lccro/tv-gin:latest
+    networks:
+      - default
+      - traefik_default
+
+    deploy:
+      labels:
+        - traefik.enable=true
+        - traefik.docker.lbswarm=true
+        - traefik.http.routers.meme.tls=true
+        - traefik.http.routers.meme.entrypoints=websecure
+        - traefik.http.routers.meme.tls.certresolver=leresolver
+        - traefik.http.routers.meme.rule=Host(`meme.monique.dev`)
+        - traefik.http.services.meme.loadbalancer.server.port=8080
