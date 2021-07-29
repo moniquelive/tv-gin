@@ -15,6 +15,7 @@ import Url exposing (percentEncode)
 -- MAIN
 
 
+main : Program () Model Msg
 main =
     Browser.element
         { init = init
@@ -38,6 +39,7 @@ type alias Meme =
     }
 
 
+defaultMeme : Meme
 defaultMeme =
     Meme "" "" "" "" 0 []
 
@@ -48,7 +50,6 @@ type State
     | Success
 
 
--- TODO: remover selectedMeme se for desnecessario
 type alias Model =
     { memes : Dict String Meme
     , selectedMeme : String

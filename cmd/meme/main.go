@@ -15,9 +15,6 @@ import (
 func main() {
 	var r = gin.Default()
 	r.Use(static.Serve("/", static.LocalFile("web", false)))
-	r.GET("/config.json", func(c *gin.Context) {
-		c.JSON(http.StatusOK, meme.Memes)
-	})
 	r.GET("/meme", memeHandler)
 	if err := r.Run(); err != nil {
 		log.Fatalln("r.Run:", err)
@@ -34,13 +31,6 @@ func memeHandler(c *gin.Context) {
 		c.String(http.StatusInternalServerError, fmt.Sprintf("FindMeme> %v", err))
 		return
 	}
-	//if len(textsVal) != theMeme.NumBoxes() {
-	//	c.String(http.StatusBadRequest,
-	//		fmt.Sprintf(`Precisamos de %d linhas de texto! %d recebida(s)...`,
-	//			theMeme.NumBoxes(),
-	//			len(textsVal)))
-	//	return
-	//}
 	buffer, err := theMeme.Generate(textsVal)
 	if err != nil {
 		c.String(http.StatusInternalServerError, fmt.Sprintf("generateMeme> %v", err))

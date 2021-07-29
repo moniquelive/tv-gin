@@ -20,32 +20,34 @@ import (
 	"github.com/golang/freetype/truetype"
 )
 
-//go:embed jetbrains.ttf
-var fontBytes []byte
+type (
+	meme struct {
+		ID         string   `json:"id"`
+		Name       string   `json:"name"`
+		Filename   string   `json:"filename"`
+		FontColor  string   `json:"font-color"`
+		LineChars  int      `json:"line-chars"`
+		MarginLeft int      `json:"margin-left"`
+		TextAlign  string   `json:"text-align"`
+		Boxes      [][4]int `json:"boxes"`
+	}
+	memes map[string]meme
+)
 
-//go:embed Handlee-Regular.ttf
-var creditsFontBytes []byte
+var (
+	//go:embed jetbrains.ttf
+	fontBytes []byte
+	//go:embed Handlee-Regular.ttf
+	creditsFontBytes []byte
+	//go:embed memes.json
+	memesBytes []byte
+)
 
-//go:embed memes.json
-var memesBytes []byte
-
-var memeFont *truetype.Font
-var creditsFont *truetype.Font
-
-type meme struct {
-	ID         string   `json:"id"`
-	Name       string   `json:"name"`
-	Filename   string   `json:"filename"`
-	FontColor  string   `json:"font-color"`
-	LineChars  int      `json:"line-chars"`
-	MarginLeft int      `json:"margin-left"`
-	TextAlign  string   `json:"text-align"`
-	Boxes      [][4]int `json:"boxes"`
-}
-
-type memes map[string]meme
-
-var Memes memes
+var (
+	memeFont    *truetype.Font
+	creditsFont *truetype.Font
+	Memes       memes
+)
 
 func init() {
 	var err error
@@ -63,27 +65,13 @@ func init() {
 	}
 }
 
-func firstValue(mm memes) meme {
-	for _, v := range mm {
-		return v
-	}
-	return meme{}
-}
-
 func (c memes) FindMeme(name string) (*meme, error) {
-	if name == "" {
-		name = firstValue(c).ID
-	}
 	for _, meme := range c {
 		if meme.ID == name {
 			return &meme, nil
 		}
 	}
 	return nil, fmt.Errorf("meme nao encontrado: %q", name)
-}
-
-func (m meme) NumBoxes() int {
-	return len(m.Boxes)
 }
 
 func (m meme) FontRGBA() color.RGBA {
