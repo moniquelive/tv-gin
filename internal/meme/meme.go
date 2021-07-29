@@ -26,8 +26,8 @@ var fontBytes []byte
 //go:embed Handlee-Regular.ttf
 var creditsFontBytes []byte
 
-//go:embed config.json
-var configJson []byte
+//go:embed memes.json
+var memesBytes []byte
 
 var memeFont *truetype.Font
 var creditsFont *truetype.Font
@@ -43,11 +43,9 @@ type meme struct {
 	Boxes      [][4]int `json:"boxes"`
 }
 
-type config struct {
-	Memes []meme `json:"memes"`
-}
+type memes map[string]meme
 
-var Config config
+var Memes memes
 
 func init() {
 	var err error
@@ -59,17 +57,24 @@ func init() {
 	if err != nil {
 		log.Fatalln(err)
 	}
-	err = json.Unmarshal(configJson, &Config)
+	err = json.Unmarshal(memesBytes, &Memes)
 	if err != nil {
 		log.Fatalln(err)
 	}
 }
 
-func (c config) FindMeme(name string) (*meme, error) {
-	if name == "" {
-		name = Config.Memes[0].ID
+func firstValue(mm memes) meme {
+	for _, v := range mm {
+		return v
 	}
-	for _, meme := range c.Memes {
+	return meme{}
+}
+
+func (c memes) FindMeme(name string) (*meme, error) {
+	if name == "" {
+		name = firstValue(c).ID
+	}
+	for _, meme := range c {
 		if meme.ID == name {
 			return &meme, nil
 		}
@@ -90,14 +95,6 @@ func (m meme) FontRGBA() color.RGBA {
 }
 
 func (m meme) Generate(texts []string) (*bytes.Buffer, error) {
-	coords := m.Boxes
-	rects := make([]image.Rectangle, len(m.Boxes))
-	for i := 0; i < len(m.Boxes); i++ {
-		rects[i] = image.Rectangle{
-			Min: image.Point{X: coords[i][0], Y: coords[i][1]},
-			Max: image.Point{X: coords[i][2], Y: coords[i][3]},
-		}
-	}
 	f, err := os.Open("./web/" + m.Filename)
 	if err != nil {
 		return nil, fmt.Errorf("os.Open: %w", err)
@@ -107,57 +104,67 @@ func (m meme) Generate(texts []string) (*bytes.Buffer, error) {
 	if err != nil {
 		return nil, fmt.Errorf("image.Decode: %w", err)
 	}
-
 	canvas := image.NewRGBA(img.Bounds())
 	draw.Draw(canvas, canvas.Bounds(), img, img.Bounds().Min, draw.Src)
 
-	// DEBUG!
-	//red := color.RGBA{R: 255, G: 0, B: 0, A: 255}
-	//for _, r := range m.Boxes {
-	//	utils.Rect(canvas, red, r[0], r[1], r[2], r[3])
-	//}
-
-	const fontSpacing = 1
-	for i := 0; i < len(m.Boxes); i++ {
-		wrap := wordWrap(texts[i], m.LineChars)
-		memeFontSize := float64(utils.CalcMonoFontSize(memeFont, fontSpacing, wrap, rects[i]))
-		fc := utils.CreateFontContext(memeFont, memeFontSize, canvas.Bounds(), canvas, m.FontRGBA())
-
-		// Draw the text.
-		y := utils.TextHeight(fc, memeFontSize, fontSpacing, wrap)
-		rectHalfHeight := rects[i].Dy() / 2
-		err = utils.DrawString(fc,
-			memeFont, memeFontSize, rects[i],
-			m.TextAlign,
-			fontSpacing,
-			wrap,
-			rects[i].Min.X+m.MarginLeft,
-			rects[i].Min.Y+rectHalfHeight-y/2)
-		if err != nil {
-			return nil, fmt.Errorf("DrawString (1): %w", err)
+	if len(texts) > 0 {
+		coords := m.Boxes
+		rects := make([]image.Rectangle, len(m.Boxes))
+		for i := 0; i < len(m.Boxes); i++ {
+			rects[i] = image.Rectangle{
+				Min: image.Point{X: coords[i][0], Y: coords[i][1]},
+				Max: image.Point{X: coords[i][2], Y: coords[i][3]},
+			}
 		}
-	}
 
-	const (
-		creditsFontSize = 32
-		creditsText     = "Esta imagem foi gerada no meme.monique.dev"
-	)
-	creditsFontColor := color.RGBA{R: 0xfe, G: 0x43, B: 0x65, A: 0xff}
-	fc := utils.CreateFontContext(creditsFont, creditsFontSize, canvas.Bounds(), canvas, creditsFontColor)
-	var (
-		creditsWidth      = utils.TextWidthInPixels(creditsFont, creditsFontSize, creditsText)
-		creditsX          = canvas.Bounds().Max.X - creditsWidth - 12
-		creditsFontHeight = int(fc.PointToFixed(creditsFontSize) >> 6)
-		creditsY          = canvas.Bounds().Max.Y - int(float64(creditsFontHeight)*1.5)
-	)
-	err = utils.DrawString(fc,
-		creditsFont, creditsFontSize, canvas.Bounds(),
-		"",
-		fontSpacing,
-		[]string{creditsText},
-		creditsX, creditsY)
-	if err != nil {
-		return nil, fmt.Errorf("DrawString (3): %w", err)
+		// DEBUG!
+		//red := color.RGBA{R: 255, G: 0, B: 0, A: 255}
+		//for _, r := range m.Boxes {
+		//	utils.Rect(canvas, red, r[0], r[1], r[2], r[3])
+		//}
+
+		const fontSpacing = 1
+		for i := 0; i < len(m.Boxes); i++ {
+			wrap := wordWrap(texts[i], m.LineChars)
+			memeFontSize := float64(utils.CalcMonoFontSize(memeFont, fontSpacing, wrap, rects[i]))
+			fc := utils.CreateFontContext(memeFont, memeFontSize, canvas.Bounds(), canvas, m.FontRGBA())
+
+			// Draw the text.
+			y := utils.TextHeight(fc, memeFontSize, fontSpacing, wrap)
+			rectHalfHeight := rects[i].Dy() / 2
+			err = utils.DrawString(fc,
+				memeFont, memeFontSize, rects[i],
+				m.TextAlign,
+				fontSpacing,
+				wrap,
+				rects[i].Min.X+m.MarginLeft,
+				rects[i].Min.Y+rectHalfHeight-y/2)
+			if err != nil {
+				return nil, fmt.Errorf("DrawString (1): %w", err)
+			}
+		}
+
+		const (
+			creditsFontSize = 32
+			creditsText     = "Esta imagem foi gerada no meme.monique.dev"
+		)
+		creditsFontColor := color.RGBA{R: 0xfe, G: 0x43, B: 0x65, A: 0xff}
+		fc := utils.CreateFontContext(creditsFont, creditsFontSize, canvas.Bounds(), canvas, creditsFontColor)
+		var (
+			creditsWidth      = utils.TextWidthInPixels(creditsFont, creditsFontSize, creditsText)
+			creditsX          = canvas.Bounds().Max.X - creditsWidth - 12
+			creditsFontHeight = int(fc.PointToFixed(creditsFontSize) >> 6)
+			creditsY          = canvas.Bounds().Max.Y - int(float64(creditsFontHeight)*1.5)
+		)
+		err = utils.DrawString(fc,
+			creditsFont, creditsFontSize, canvas.Bounds(),
+			"",
+			fontSpacing,
+			[]string{creditsText},
+			creditsX, creditsY)
+		if err != nil {
+			return nil, fmt.Errorf("DrawString (3): %w", err)
+		}
 	}
 
 	opts := jpeg.Options{Quality: 99}

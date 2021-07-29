@@ -1,0 +1,51 @@
+{
+  "drake": {
+    "id": "drake",
+    "name": "Drake Hotline Bling",
+    "filename": "img/drake.jpg",
+    "font-color": "#000",
+    "line-chars": 13,
+    "boxes": [
+      [600, 0, 1199, 599],
+      [600, 600, 1199, 1199]
+    ]
+  },
+  "philo": {
+    "id": "philo",
+    "name": "Philosoraptor",
+    "filename": "img/philosoraptor.jpg",
+    "font-color": "#fff",
+    "line-chars": 34,
+    "text-align": "center",
+    "boxes": [
+      [0, 0, 1399, 349],
+      [0, 900, 1399, 1399]
+    ]
+  },
+  "standup-dino": {
+    "id": "standup-dino",
+    "name": "Standup Dino",
+    "filename": "img/standup-dino.png",
+    "font-color": "#fff",
+    "line-chars": 20,
+    "text-align": "center",
+    "boxes": [
+      [0, 0, 370, 100],
+      [390, 0, 745, 100]
+    ]
+  },
+  "grus-plan": {
+    "id": "grus-plan",
+    "name": "Gru's Plan",
+    "filename": "img/gru.jpg",
+    "font-color": "#000",
+    "line-chars": 20,
+    "text-align": "center",
+    "boxes": [
+      [201, 45, 333, 222],
+      [551, 50, 683, 223],
+      [204, 275, 334, 447],
+      [554, 276, 684, 448]
+    ]
+  }
+}
