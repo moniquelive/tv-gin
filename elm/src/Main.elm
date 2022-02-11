@@ -72,52 +72,58 @@ init _ =
 
 
 type Msg
-    = UpdateURL
-    | RefreshConfig
+    = RefreshConfig
     | GotConfig (Result Http.Error (Dict String Meme))
-    | UpdateMeme String
+    | MemeChanged String
     | TextChanged Int String
 
 
 update : Msg -> Model -> ( Model, Cmd Msg )
 update msg model =
     case msg of
-        UpdateURL ->
-            ( model, getConfig )
-
         RefreshConfig ->
-            ( defaultModel, getConfig )
+            ( defaultModel
+            , getConfig
+            )
 
-        UpdateMeme id ->
+        MemeChanged id ->
             let
                 meme =
-                    Dict.get id model.memes |> Maybe.withDefault defaultMeme
+                    Maybe.withDefault defaultMeme (Dict.get id model.memes)
 
                 numTexts =
                     List.length meme.boxes
 
-                previousText n =
-                    Array.get n model.texts |> Maybe.withDefault ""
+                savedText n =
+                    Maybe.withDefault "" (Array.get n model.texts)
             in
-            ( { model | selectedMeme = id, texts = Array.initialize numTexts previousText }, Cmd.none )
+            ( { model | selectedMeme = id, texts = Array.initialize numTexts savedText }
+            , Cmd.none
+            )
 
         GotConfig result ->
             case result of
                 Ok memes ->
                     let
                         firstMeme =
-                            List.head (Dict.values memes) |> Maybe.withDefault defaultMeme
+                            Maybe.withDefault defaultMeme (List.head (Dict.values memes))
 
                         numTexts =
                             List.length firstMeme.boxes
                     in
-                    ( Model memes firstMeme.id (Array.repeat numTexts "") Success, Cmd.none )
+                    ( Model memes firstMeme.id (Array.repeat numTexts "") Success
+                    , Cmd.none
+                    )
 
                 Err _ ->
-                    ( { model | state = Failure }, Cmd.none )
+                    ( { model | state = Failure }
+                    , Cmd.none
+                    )
 
         TextChanged index str ->
-            ( { model | texts = Array.set index str model.texts }, Cmd.none )
+            ( { model | texts = Array.set index str model.texts }
+            , Cmd.none
+            )
 
 
 
@@ -150,7 +156,7 @@ view model =
                 [ h1 [] [ text "Escolha o Meme:" ]
                 , div [ class "row" ]
                     [ div [ class "col-md-4 mb-4 mb-md-0" ]
-                        [ select [ value model.selectedMeme, class "mb-4 form-control", onInput UpdateMeme ]
+                        [ select [ value model.selectedMeme, class "mb-4 form-control", onInput MemeChanged ]
                             [ optgroup [ attribute "label" "Implementados" ]
                                 (List.map viewMeme (Dict.values model.memes))
                             ]
@@ -159,7 +165,7 @@ view model =
                     , div [ class "col-md-8" ]
                         [ img
                             [ class "mw-100"
-                            , src ("/meme?meme=" ++ model.selectedMeme ++ Array.foldl createTextParams "&" model.texts)
+                            , src ("/meme?meme=" ++ model.selectedMeme ++ "&" ++ encodeTexts model.texts)
                             ]
                             []
                         ]
@@ -183,9 +189,15 @@ createText ( index, str ) =
         []
 
 
-createTextParams : String -> String -> String
-createTextParams str acc =
-    acc ++ percentEncode "text[]" ++ "=" ++ percentEncode str ++ "&"
+encodeTexts : Array String -> String
+encodeTexts texts =
+    let
+        encodeParam param =
+            percentEncode "text[]" ++ "=" ++ percentEncode param
+    in
+    Array.map encodeParam texts
+        |> Array.toList
+        |> String.join "&"
 
 
 

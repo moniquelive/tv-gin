@@ -1,8 +1,6 @@
 package meme
 
 import (
-	"github.com/moniquelive/tv-gin/internal/utils"
-
 	"bytes"
 	_ "embed"
 	"encoding/json"
@@ -12,9 +10,11 @@ import (
 	"image/draw"
 	"image/jpeg"
 	_ "image/png"
+	"io/fs"
 	"log"
-	"os"
 	"strings"
+
+	"github.com/moniquelive/tv-gin/internal/utils"
 
 	"github.com/golang/freetype"
 	"github.com/golang/freetype/truetype"
@@ -37,16 +37,13 @@ type (
 var (
 	//go:embed jetbrains.ttf
 	fontBytes []byte
+	memeFont  *truetype.Font
+
 	//go:embed Handlee-Regular.ttf
 	creditsFontBytes []byte
-	//go:embed memes.json
-	memesBytes []byte
-)
+	creditsFont      *truetype.Font
 
-var (
-	memeFont    *truetype.Font
-	creditsFont *truetype.Font
-	Memes       memes
+	fsReader fs.ReadFileFS
 )
 
 func init() {
@@ -59,14 +56,23 @@ func init() {
 	if err != nil {
 		log.Fatalln(err)
 	}
-	err = json.Unmarshal(memesBytes, &Memes)
-	if err != nil {
-		log.Fatalln(err)
-	}
 }
 
-func (c memes) FindMeme(name string) (*meme, error) {
-	for _, meme := range c {
+func NewMeme(reader fs.ReadFileFS) *memes {
+	fsReader = reader
+	memesBytes, err := fsReader.ReadFile("web/config.json")
+	if err != nil {
+		log.Fatalf("NewMeme>ReadFile> %v", err)
+	}
+	var config memes
+	if err := json.Unmarshal(memesBytes, &config); err != nil {
+		log.Fatalln(err)
+	}
+	return &config
+}
+
+func (mm memes) FindMeme(name string) (*meme, error) {
+	for _, meme := range mm {
 		if meme.ID == name {
 			return &meme, nil
 		}
@@ -83,9 +89,9 @@ func (m meme) FontRGBA() color.RGBA {
 }
 
 func (m meme) Generate(texts []string) (*bytes.Buffer, error) {
-	f, err := os.Open("./web/" + m.Filename)
+	f, err := fsReader.Open("web/" + m.Filename)
 	if err != nil {
-		return nil, fmt.Errorf("os.Open: %w", err)
+		return nil, fmt.Errorf("fs.Open: %w", err)
 	}
 	defer f.Close()
 	img, _, err := image.Decode(f)
