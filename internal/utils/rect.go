@@ -19,7 +19,7 @@ func VLine(img *image.RGBA, col color.Color, x, y1, y2 int) {
 	}
 }
 
-// Rect draws a rectangle utilizing HLine() and VLine()
+// Rect draws a rectangle using HLine() and VLine()
 func Rect(img *image.RGBA, col color.Color, x1, y1, x2, y2 int) {
 	HLine(img, col, x1, y1, x2)
 	HLine(img, col, x1, y2, x2)
