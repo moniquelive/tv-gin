@@ -3,10 +3,6 @@ FROM golang:alpine AS go-builder
 
 RUN apk add --no-cache upx
 
-ENV CGO_ENABLED=0 \
-  GOOS=linux \
-  GOARCH=amd64
-
 WORKDIR /go/src
 
 COPY go.mod .
@@ -15,12 +11,16 @@ RUN go mod download
 
 COPY . .
 
-# RUN ls
+ENV GO111MODULE=on \
+  CGO_ENABLED=0 \
+  GOOS=linux \
+  GOARCH=amd64
+
 RUN go build \
       -trimpath \
       -ldflags="-s -w -extldflags '-static'" \
       -o /go/bin/main \
-      ./cmd/meme
+      .
 
 RUN upx --lzma /go/bin/main
 

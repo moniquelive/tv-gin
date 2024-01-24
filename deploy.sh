@@ -1,5 +1,6 @@
 #!/bin/sh
 
-docker build -t lccro/tv-gin:latest .
-docker push lccro/tv-gin:latest
+REG=lccro/tv-gin:latest
+docker build --platform linux/amd64 -t $REG .
+docker push $REG
 
