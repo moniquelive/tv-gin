@@ -3,7 +3,7 @@
 set -e
 
 js="elm.js"
-min="../web/elm.min.js"
+min="../web/js/elm.min.js"
 
 elm make --optimize --output=$js src/Main.elm #"$@"
 # elm make --output=$js src/Main.elm #"$@"

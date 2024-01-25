@@ -220,7 +220,7 @@ encodeTexts texts =
 getConfig : Cmd Msg
 getConfig =
     Http.get
-        { url = "/config.json"
+        { url = "/cfg/config.json"
         , expect = Http.expectJson GotConfig configDecoder
         }
 

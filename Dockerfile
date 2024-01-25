@@ -37,15 +37,14 @@ RUN npm install -g uglify-js
 WORKDIR /elm
 COPY elm .
 
-RUN elm make --optimize --output=elm.js src/Main.elm
+RUN elm make src/Main.elm --optimize --output=elm.js
 RUN uglifyjs elm.js --compress 'pure_funcs=[F2,F3,F4,F5,F6,F7,F8,F9,A2,A3,A4,A5,A6,A7,A8,A9],pure_getters,keep_fargs=false,unsafe_comps,unsafe' | uglifyjs --mangle --output elm.min.js
 
 #-----------------------------------------------------------------------------
 FROM scratch
 
-ENV GIN_MODE=release
-
 COPY --from=go-builder /go/bin/main .
-COPY --from=elm-builder /elm/elm.min.js web/elm.min.js
+COPY --from=go-builder /go/src/web web
+COPY --from=elm-builder /elm/elm.min.js web/js/elm.min.js
 
 ENTRYPOINT ["./main"]

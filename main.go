@@ -2,59 +2,74 @@ package main
 
 import (
 	"embed"
-	"fmt"
-	"github.com/moniquelive/tv-gin/meme"
-	"log"
 	"net/http"
+	"os"
+	"runtime"
 
-	"github.com/gin-gonic/gin"
+	"github.com/gofiber/fiber/v2"
+	"github.com/gofiber/fiber/v2/log"
+	"github.com/gofiber/fiber/v2/middleware/cors"
+	"github.com/gofiber/fiber/v2/middleware/favicon"
+	"github.com/gofiber/fiber/v2/middleware/helmet"
+	"github.com/gofiber/fiber/v2/middleware/logger"
+	"github.com/gofiber/fiber/v2/middleware/recover"
+	"github.com/gofiber/template/html/v2"
+
+	"github.com/moniquelive/tv-gin/handler"
+	"github.com/moniquelive/tv-gin/router"
 )
 
 //go:embed web
-var webRoot embed.FS
+var embedFS embed.FS
 
-//go:embed web/config.json
+//go:embed web/cfg/config.json
 var configFile []byte
 
-var memes *meme.Memes
-
 func init() {
-	var err error
-	memes, err = meme.NewMeme(configFile)
-	if err != nil {
-		log.Fatalf("NewMeme: %v", err)
-	}
-}
-
-func serveMeme(c *gin.Context) {
-	memeName := c.Query("meme")
-	textMessages := c.QueryArray("text[]")
-	theMeme, err := memes.FindMeme(memeName)
-	if err != nil {
-		_ = c.AbortWithError(http.StatusNotFound, fmt.Errorf("FindMeme: %w", err))
-		return
-	}
-	memeImage, err := theMeme.Generate(webRoot, textMessages)
-	if err != nil {
-		_ = c.AbortWithError(http.StatusInternalServerError, fmt.Errorf("generateMeme: %w", err))
-		return
-	}
-	c.DataFromReader(http.StatusOK, int64(memeImage.Len()), "image/jpeg", memeImage, nil)
+	handler.Init(embedFS, configFile)
 }
 
 func main() {
-	r := gin.Default()
-	r.Use(gin.ErrorLogger())
-	r.GET("/*resource", func(c *gin.Context) {
-		resourceName := c.Param("resource")
-		switch resourceName {
-		case "/meme":
-			serveMeme(c)
-		default:
-			c.FileFromFS("/web"+resourceName, http.FS(webRoot))
-		}
-	})
-	if err := r.Run(); err != nil {
-		log.Fatalln("r.Run:", err)
+	var engine *html.Engine
+	if runtime.GOOS == "linux" {
+		engine = productionEngine()
+	} else {
+		engine = developmentEngine()
 	}
+	//engine.AddFuncMap(sprig.HtmlFuncMap())
+	fiberConfig := fiber.Config{
+		Views:             engine,
+		PassLocalsToViews: true,
+	}
+	corsConfig := cors.Config{
+		AllowOrigins: os.Getenv("CORS_ALLOW_ORIGINS"),
+		AllowHeaders: "Origin, Content-Type, Accept",
+	}
+	app := fiber.New(fiberConfig)
+	app.Use(favicon.New()).
+		Use(logger.New()).
+		Use(helmet.New()).
+		Use(recover.New()).
+		Use(cors.New(corsConfig))
+
+	router.SetupRoutes(app)
+
+	if runtime.GOOS == "linux" {
+		log.Fatal(app.Listen(":8080"))
+	} else {
+		log.Fatal(app.Listen("localhost:8080"))
+	}
+}
+
+func developmentEngine() (engine *html.Engine) {
+	engine = html.NewFileSystem(http.FS(os.DirFS("web")), ".html")
+	engine.Reload(true)
+	engine.Debug(true)
+	return
+}
+
+func productionEngine() (engine *html.Engine) {
+	engine = html.NewFileSystem(http.FS(embedFS), ".html")
+	engine.Directory = "web"
+	return
 }
