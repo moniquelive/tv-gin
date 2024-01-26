@@ -2,7 +2,6 @@ package handler
 
 import (
 	"embed"
-	_ "embed"
 	"fmt"
 	"net/http"
 
@@ -24,10 +23,6 @@ func Init(embed embed.FS, configFile []byte) {
 	if err != nil {
 		log.Fatalf("NewMeme: %v", err)
 	}
-}
-
-func Index(c *fiber.Ctx) error {
-	return c.Render("index", fiber.Map{})
 }
 
 func Meme(c *fiber.Ctx) error {
